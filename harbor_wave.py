@@ -83,7 +83,7 @@ def main():
     parser.add_argument("-k","--ssh-key-n"           ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
     parser.add_argument("-n","--vm-base-name"        ,help="Base Name For New VMs",type=str)
     parser.add_argument("-p","--project"             ,help="Digitial Ocean Project to use",type=str)
-    parser.add_argument("-s","--vm-size"             ,help="Size code for new VMs")
+    parser.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
     parser.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)
     parser.add_argument("-u","--use-dns"             ,help="Use FQDNs for naming VMs and add DNS entries in Networking")
 

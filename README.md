@@ -30,7 +30,16 @@ Setup digital Ocean Account. You need:
 Three
 ------
 Upload Custom Template Image to DO. This can be done in the WebUI
+
 https://docs.digitalocean.com/products/images/custom-images/
+
+This project is designed with Disk-Image-Scripts in mind:
+
+https://github.com/GIJack/disk-image-scripts
+
+You can use disk-image scripts to create custom templates based on arch, and
+in the near future, debian based distros(such as Ubuntu-server), and hopefully
+Redhat
 
 TODO: add this to the script, in python(needs S3/buckets NOT in the DO lib)
 

@@ -24,7 +24,7 @@ Two
 Setup digital Ocean Account. You need:
 * SSH Key
 * Project(used as container)
-* DNS(optional
+* DNS(optional)
 * API Key
 
 Three

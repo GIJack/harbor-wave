@@ -89,7 +89,7 @@ def main():
 
     
     args = parser.parse_args()
-    print(args)
+    print(args) #DEBUG: Remove before flight
 
 if __name__ == "__main__":
     main()

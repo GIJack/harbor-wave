@@ -85,7 +85,7 @@ def main():
     parser.add_argument("-p","--project"             ,help="Digitial Ocean Project to use",type=str)
     parser.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
     parser.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)
-    parser.add_argument("-u","--use-dns"             ,help="Use FQDNs for naming VMs and add DNS entries in Networking")
+    parser.add_argument("-u","--use-dns"             ,help="Use FQDNs for naming VMs and add DNS entries in Networking",action="store_true")
 
     
     args = parser.parse_args()

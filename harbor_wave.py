@@ -161,13 +161,14 @@ def list_machines(loaded_config,terse=False):
     except digitalocean.DataReadError:
         exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
     
-    tab_spacing = 10
-    header  = colors.bold + "Name\t\tRegion\t\tSize\t\tImage\t\tDatestamp".expandtabs(tab_spacing) + colors.reset
+    tab_spacing = 12
+    header  = colors.bold + "Name\t\tRegion\tSize\t\tImage\t\tDatestamp".expandtabs(tab_spacing) + colors.reset
     out_line = ""
     if terse == False:
         print(header)
         for droplet in droplet_list:
-            out_line = droplet.name + "\t\t".expandtabs(tab_spacing) + droplet.region['slug'] + "\t\t".expandtabs(tab_spacing) + droplet.size['slug'] + "\t\t".expandtabs(tab_spacing) + droplet.image['name'] + "\t\t".expandtabs(tab_spacing) + droplet.created_at
+            out_line = droplet.name + "\t" + droplet.region['slug'] + "\t" + droplet.size['slug'] + "\t\t" + droplet.image['name'] + "\t\t" + droplet.created_at
+            out_line = out_line.expandtabs(tab_spacing)
             print(out_line)
     elif terse == True:
         for droplet in droplet_list:

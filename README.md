@@ -1,7 +1,7 @@
 harbor-wave
 =============
 
-STATUS: still not functioning yet, config file handling is in.
+STATUS: in progress. commands may or may not work
 
 Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
 service, to rapidly spin up and destroy custom templates. Based on a digital

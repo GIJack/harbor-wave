@@ -145,9 +145,9 @@ def list_machines(loaded_config,terse=False):
     if terse is True, then print in CSV format for grep and cut'''
     
     # pre-flight tests
-    if tag not in loaded_config.keys():
+    if "tag" not in loaded_config.keys():
         exit_with_error(2,"Droplet tag not set in config. see --help for set and tag item")
-    if api-key not in loaded_config.keys():
+    if "api-key" not in loaded_config.keys():
         exit_with_error(2,"api-key not set. see --help on set.")
     droplet_tag = loaded_config['tag']
     api_key     = loaded_config['api-key']
@@ -162,7 +162,7 @@ def list_machines(loaded_config,terse=False):
         exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
     
     tab_spacing = 10
-    header  = colors.bold + "Name\t\tRegion\t\tSize\t\tImage\t\tDatestamp".expandtabs(tab_spacing) colors.reset
+    header  = colors.bold + "Name\t\tRegion\t\tSize\t\tImage\t\tDatestamp".expandtabs(tab_spacing) + colors.reset
     out_line = ""
     if terse == False:
         print(header)

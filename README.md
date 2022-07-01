@@ -1,8 +1,7 @@
 harbor-wave
 =============
 
-STATUS: MOCKUP. At this point, this is little more than a UI and config
-mockup. Work in Progress
+STATUS: still not functioning yet, config file handling is in.
 
 Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
 service, to rapidly spin up and destroy custom templates. Based on a digital

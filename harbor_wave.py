@@ -419,6 +419,8 @@ def main():
         option = args.arguments[0]
         if option == "machines":
             list_machines(loaded_config)
+    else:
+        exit_with_error(2,"No such command. See --help")
 
 if __name__ == "__main__":
     main()

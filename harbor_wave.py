@@ -19,17 +19,22 @@ Switches override config
 
   help - this text
 
-  list-templates - Show available custom images
+  list [what] - list various things. Subcommands/arguments:
+      templates - Show available custom images.
 
-  list-machines  - Show virtual machines in project
+      machines  - Show Virtual Machines in use associated with harbor-wave.
+      Based on VM tag in settings.
   
-  list-regions   - List valid region codes for use in config
+      regions   - List valid region codes for use in config
   
-  list-vm-sizes  - List of valid vm size codes for use in config
+      vm-sizes  - List of valid vm size codes for use in config
+      
+    example: harbor_wave list vm-sizes
 
   spawn <N> - Create a new N new VMs. default is 1
 
-  destroy [Name] - Destroy Name virtualmachine
+  destroy [VM Names] - Destroy Name VMs. List of names. the ALL tag will destroy
+  all VMs associated with harborwave as determined by having the right VM tag.
 
   set [property] - set a config item. See bellow for list of config items
 
@@ -45,32 +50,37 @@ Switches override config
    api-key - Digital Ocean API key, used for accessing the account. NOTE this
    is the only option that does NOT go in the .cfg file, but rather the seperate
    api-key file
-   
-   region  - digital ocean region code slug to spawn new machines. You can get
-   a list of valid entries with the list-reigons command. Default: nyc1
-   
-   project - digital ocean project name. Optional, but must exist if set. This
-   project is where new VMs will spawn, and will limit to this project listing.
-   
-   vm-base-name - what to call VMs that will be spawned, if more than one is
-   spawned, this will be the base, and new names will be incremented. At current
-   this will be numeric. Might change in the future(perhaps name-sets)
-   
-   vm-size     - Size code for how big the VM should be.  See list-vm-sizes for
-   list of size codes. Default: s-1vcpu-1gb.
-   
-   vm-template - ID of the custom template image for spawning VMs. you can get
-   a list of valid values with list-templates
-   
-   use-dns     - use fully qualified domain names for VM host names, and set
-   DNS in network settings. True or False.
 
    domain      - DNS domain to use if use-dns is set True
+   
+   project - digital ocean project name. Optional, but must exist if set.
+   Droplets created with spawn will be added to this project.
+
+   region  - digital ocean region code slug to spawn droplets. You can get a
+   list of valid entries with the list-reigons command. Default: nyc1
    
    ssh-key-n   - Interger, count from 0. Select which SSH key is being used to
    access the VM. Should display in order on the DO website. This is the ssh
    login key for root unless you have modified it with cloud-init. If you only
    have one key, this is 0
+   
+   tag         - tag to use for the droplets that harbor-wave will use to
+   recognize its own. Default: harborwave
+      
+   vm-base-name - what to call droplets that will be spawned, if more than one
+   is spawned, this will be the base, and new names will be incremented. At
+   current this will be numeric. Might change in the future(perhaps name-sets)
+   
+   vm-size     - Size code for how big the droplet should be.  See list-vm-sizes
+   for list of size codes. Default: s-1vcpu-1gb.
+   
+   vm-template - ID of the custom template image for spawning droplets. You can
+   get a list of valid values with list-templates
+   
+   use-dns     - Use fully qualified domain names for droplet host names, and
+   set DNS in network settings. True or False. This domain MUST EXIST on your
+   Digital Ocean account.
+
 '''
 
 import os,sys
@@ -83,6 +93,7 @@ default_config = {
     "region"       : "nyc1",
     "project"      : "",
     "ssh-key-n"    : 0,
+    "tag"          : "harborwave"
     "vm-base-name" : "",
     "vm-size"      : "s-1vcpu-1gb",
     "vm-template"  : "",
@@ -127,15 +138,51 @@ def check_api_key(key):
     # No more tests
     return True
 
+def list_machines(loaded_config,terse=False):
+    '''give a list of droplets in project, nomially ones created with this prog.
+    if terse is True, then print in CSV format for grep and cut'''
+    
+    # pre-flight tests
+    if tag not in loaded_config.keys():
+        exit_with_error(2,"Droplet tag not set in config. see --help for set and tag item")
+    if api-key not in loaded_config.keys():
+        exit_with_error(2,"api-key not set. see --help on set."
+    droplet_tag = loaded_config['tag']
+    api_key     = loaded_config['api-key']
+    if check_api_key(api_key) != True:
+        exit_with_error(2,"Invalid API Key")
+    
+    #lets go
+    manager = digitalocean.Manager(token=api_key)
+    try:
+        droplet_list = manager.get_all_droplets(tag_name=droplet_tag)
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
+    
+    tab_spacing = 10
+    header  = colors.bold + "Name\t\tRegion\t\tSize\t\tImage\t\tDatestamp".expandtabs(tab_spacing) colors.reset
+    out_line = ""
+    if terse == False:
+        print(header)
+        for droplet in droplet_list:
+            out_line = droplet.name + "\t\t".expandtabs(tab_spacing) + droplet.region['slug'] + "\t\t".expandtabs(tab_spacing) + droplet.size['slug'] + "\t\t".expandtabs(tab_spacing) + droplet.image['name'] + "\t\t".expandtabs(tab_spacing) + droplet.created_at
+            print(out_line)
+    elif terse == True:
+        for droplet in droplet_list:
+            out_line = droplet.name + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + droplet.created_at
+            print(out_line)
+    else:
+        exit_with_error(9,"list-droplets: terse is neither True nor False, should never get here, debug!")
+
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
     api_file_name    = "api-key"
     config_file_name = "harbor-wave.cfg"
     api_file         = config_dir + "/" + api_file_name
     config_file      = config_dir + "/" + config_file_name
-    set_item_str     = ["api-key","domain", "vm-base-name","project","vm-size","region","vm-template"]
-    set_item_int     = ["ssh-key-n"]
-    set_item_bool    = ["use-dns"]
+    set_item_str     = ("api-key","domain", "vm-base-name","project","vm-size","region","vm-template", "tag")
+    set_item_int     = ("ssh-key-n")
+    set_item_bool    = ("use-dns")
     all_set_items    = set_item_str + set_item_int + set_item_bool
     
     ## check if valid
@@ -211,6 +258,8 @@ def print_config(loaded_config,terse=False):
                 value = str(value)
             out_line = item + ',' + value
             print(out_line)
+    else:
+        exit_with_error(9,"print-config: terse is neither True nor False, should never get here, debug!")
     
 def get_config(loaded_config,item):
     '''prints working config item, takes two options, dict with config items, and item you need'''
@@ -307,6 +356,7 @@ def main():
 
     parser.add_argument("-a","--api-key"             ,help="Digitial Ocean API key to use",type=str)
     parser.add_argument("-d","--domain"              ,help="Domain to use if --use-dns is used.",type=str)
+    parser.add_argument("-g","--tag"                 ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
     parser.add_argument("-k","--ssh-key-n"           ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
     parser.add_argument("-n","--vm-base-name"        ,help="Base Name For New VMs",type=str)
     parser.add_argument("-p","--project"             ,help="Digitial Ocean Project to use",type=str)
@@ -329,6 +379,8 @@ def main():
         loaded_config['api-key']       = args.api_key
     if args.domain != None:
         loaded_config['domain']        = args.domain
+    if args.tag != None:
+        loaded_config['tag']           = args.tag
     if args.ssh_key_n != None:
         loaded_config['ssh-key-n']     = args.ssh_key_n
     if args.vm_base_name != None:
@@ -349,17 +401,24 @@ def main():
         sys.exit(0)
     elif args.command == "set":
         if len(args.arguments) < 2:
-            exit_with_error(2,"Set command takes two arguments, item and value. See --help")
+            exit_with_error(2,"set: Command takes two arguments, item and value. See --help")
         item  = args.arguments[0]
         value = args.arguments[1]
         set_config(config_dir,loaded_config,item,value)
     elif args.command == "get":
         if len(args.arguments) < 1:
-            exit_with_error(2,"Get command takes one argument: item. See --help")
+            exit_with_error(2,"get: Command takes one argument: item. See --help")
         item = args.arguments[0]
         get_config(loaded_config,item)
     elif args.command == "print-config":
         print_config(loaded_config)
+    elif args.command == "list":
+        if len(args.arguments) < 1:
+            exit_with_error(2,"list: list what? needs an argument, see --help")
+        valid_options = ( 'templates','machines','vm-sizes','regions')
+        option = args.arguments[0]
+        if option == "machines":
+            list_machines(loaded_config)
 
 if __name__ == "__main__":
     main()

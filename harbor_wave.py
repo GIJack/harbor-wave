@@ -308,10 +308,10 @@ def main():
 
     # get config from file
     config_dir = os.getenv("HOME") + "/.config/harbor-wave/"
-    #try:
-    loaded_config = check_and_load_config(config_dir)
-    #except:
-    #    exit_with_error(2,"Config handling routine ate it, debug")
+    try:
+        loaded_config = check_and_load_config(config_dir)
+    except:
+        warn("could not load config, all options must be specified on command line or harbor-wave will fail")
     
     # Now apply command line switch options
     

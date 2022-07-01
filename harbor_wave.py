@@ -22,9 +22,7 @@ Switches override config
   list [what] - list various things. Subcommands/arguments:
       machines  - Show Virtual Machines in use associated with harbor-wave.
       Based on VM tag in settings.
-      
-      projects - projects in Digital Ocean Account
-      
+
       templates - Show available custom images.
   
       regions   - List valid region codes for use in config
@@ -93,7 +91,6 @@ import digitalocean
 default_config = {
     "domain"       : "",
     "region"       : "nyc1",
-    "project"      : "",
     "ssh-key-n"    : 0,
     "tag"          : "harborwave",
     "vm-base-name" : "",
@@ -362,7 +359,6 @@ def main():
     parser.add_argument("-g","--tag"                 ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
     parser.add_argument("-k","--ssh-key-n"           ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
     parser.add_argument("-n","--vm-base-name"        ,help="Base Name For New VMs",type=str)
-    parser.add_argument("-p","--project"             ,help="Digitial Ocean Project to use",type=str)
     parser.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
     parser.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)
     parser.add_argument("-u","--use-dns"             ,help="Use FQDNs for naming VMs and add DNS entries in Networking",action="store_true")
@@ -388,8 +384,6 @@ def main():
         loaded_config['ssh-key-n']     = args.ssh_key_n
     if args.vm_base_name != None:
         loaded_config ['vm-base-name'] = args.vm_base_name
-    if args.project != None:
-        loaded_config['project']       = args.project
     if args.vm_size != None:
         loaded_config['vm-size']       = args.vm_size
     if args.vm_template != None:
@@ -416,12 +410,17 @@ def main():
     elif args.command == "print-config":
         print_config(loaded_config)
     elif args.command == "list":
+        terse = False
         if len(args.arguments) < 1:
             exit_with_error(2,"list: list what? needs an argument, see --help")
-        valid_options = ( 'templates','machines','vm-sizes','regions')
         option = args.arguments[0]
-        if option == "machines":
+        if option == "help":
+            message("list:  valid options are machines, templates, regions, and vm-sizes. see --help for more info")
+            sys.exit(4)
+        elif option == "machines":
             list_machines(loaded_config)
+        else:
+            exit_with_error(2,"Invalid option")
     else:
         exit_with_error(2,"No such command. See --help")
 

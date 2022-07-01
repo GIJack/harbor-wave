@@ -31,12 +31,14 @@ Switches override config
 
   destroy [Name] - Destroy Name virtualmachine
 
-  set [property] - set a config item.
-    Items string:  region, project, vm-base-name, vm-template, domain, api-key
-    Items bool:    use-dns
-    Items Int:     ssh-key-n
-    
-  touch         - create a blank config file, so this can be edited by hand.
+  set [property] - set a config item. See bellow for list of config items
+
+  get [property] - print value for item, see bellow for list of config items
+  
+  print-config   - print all config items in pretty table.
+
+  touch         - Stop after proccessing initial config. useful for generating
+  blank config file. Will not touch the api-key
 
         CONFIG ITEMS:
 
@@ -131,7 +133,7 @@ def set_config(config_dir,loaded_config,item,value):
     config_file_name = "harbor-wave.cfg"
     api_file         = config_dir + "/" + api_file_name
     config_file      = config_dir + "/" + config_file_name
-    set_item_str     = ["api-key","domain", "vm-base-name","project","vm-size","region"]
+    set_item_str     = ["api-key","domain", "vm-base-name","project","vm-size","region","vm-template"]
     set_item_int     = ["ssh-key-n"]
     set_item_bool    = ["use-dns"]
     all_set_items    = set_item_str + set_item_int + set_item_bool
@@ -147,17 +149,17 @@ def set_config(config_dir,loaded_config,item,value):
     # Check and set type
     if item in set_item_str:
         try:
-            item = str(item)
+            value = str(value)
         except:
             exit_with_error(2,"set: invalid value for " + item)
     elif item in set_item_int:
         try:
-            item = int(item)
+            value = int(value)
         except:
             exit_with_error(2,"set: invalid value for " + item)
     elif item in set_item_bool:
         try:
-            item = bool(item)
+            value = bool(value)
         except:
             exit_with_error(2,"set: invalid value for " + item)
 
@@ -184,6 +186,32 @@ def set_config(config_dir,loaded_config,item,value):
     except:
         exit_with_error(2,"set: Could not write to config file")
 
+def print_config(loaded_config,terse=False):
+    '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''
+    restricted_list = ['api-key']
+    header_line= colors.bold + "ITEM\t\tVALUE".expandtabs(13) + colors.reset
+    print(header_line)
+    out_line=""
+    for item in loaded_config:
+        if item in restricted_list:
+            value = "********"
+        else:
+            value = loaded_config[item]
+            value = str(value)
+        out_line = item + "\t\t" + value
+        out_line = out_line.expandtabs(13)
+        print(out_line)
+    
+def get_config(loaded_config,item):
+    '''prints working config item, takes two options, dict with config items, and item you need'''
+    if item == "api-key":
+        exit_with_error(2,"get: Won't print api key... ")
+    if item not in loaded_config.keys():
+        exit_with_error(2,"get: No such config item: " + item)
+    
+    output = loaded_config[item]
+    output = str(output)
+    print(output)
 
 def write_config(file_name,config_obj):
     '''write config to JSON file'''
@@ -314,7 +342,14 @@ def main():
             exit_with_error(2,"Set command takes two arguments, item and value. See --help")
         item  = args.arguments[0]
         value = args.arguments[1]
-        
         set_config(config_dir,loaded_config,item,value)
+    elif args.command == "get":
+        if len(args.arguments) < 1:
+            exit_with_error(2,"Get command takes one argument: item. See --help")
+        item = args.arguments[0]
+        get_config(loaded_config,item)
+    elif args.command == "print-config":
+        print_config(loaded_config)
+
 if __name__ == "__main__":
     main()

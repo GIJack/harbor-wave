@@ -20,10 +20,12 @@ Switches override config
   help - this text
 
   list [what] - list various things. Subcommands/arguments:
-      templates - Show available custom images.
-
       machines  - Show Virtual Machines in use associated with harbor-wave.
       Based on VM tag in settings.
+      
+      projects - projects in Digital Ocean Account
+      
+      templates - Show available custom images.
   
       regions   - List valid region codes for use in config
   
@@ -93,7 +95,7 @@ default_config = {
     "region"       : "nyc1",
     "project"      : "",
     "ssh-key-n"    : 0,
-    "tag"          : "harborwave"
+    "tag"          : "harborwave",
     "vm-base-name" : "",
     "vm-size"      : "s-1vcpu-1gb",
     "vm-template"  : "",

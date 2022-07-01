@@ -148,7 +148,7 @@ def list_machines(loaded_config,terse=False):
     if tag not in loaded_config.keys():
         exit_with_error(2,"Droplet tag not set in config. see --help for set and tag item")
     if api-key not in loaded_config.keys():
-        exit_with_error(2,"api-key not set. see --help on set."
+        exit_with_error(2,"api-key not set. see --help on set.")
     droplet_tag = loaded_config['tag']
     api_key     = loaded_config['api-key']
     if check_api_key(api_key) != True:

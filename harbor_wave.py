@@ -190,17 +190,27 @@ def print_config(loaded_config,terse=False):
     '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''
     restricted_list = ['api-key']
     header_line= colors.bold + "ITEM\t\tVALUE".expandtabs(13) + colors.reset
-    print(header_line)
-    out_line=""
-    for item in loaded_config:
-        if item in restricted_list:
-            value = "********"
-        else:
-            value = loaded_config[item]
-            value = str(value)
-        out_line = item + "\t\t" + value
-        out_line = out_line.expandtabs(13)
-        print(out_line)
+    if terse == False:
+        print(header_line)
+        out_line=""
+        for item in loaded_config:
+            if item in restricted_list:
+                value = "********"
+            else:
+                value = loaded_config[item]
+                value = str(value)
+            out_line = item + "\t\t" + value
+            out_line = out_line.expandtabs(13)
+            print(out_line)
+    elif terse == True:
+        for item in loaded_config:
+            if item in restricted_list:
+                value = "HIDDEN"
+            else:
+                value = loaded_config[item]
+                value = str(value)
+            out_line = item + ',' + value
+            print(out_line)
     
 def get_config(loaded_config,item):
     '''prints working config item, takes two options, dict with config items, and item you need'''

@@ -20,14 +20,18 @@ Switches override config
   help - this text
 
   list [what] - list various things. Subcommands/arguments:
-      machines  - Show Virtual Machines in use associated with harbor-wave.
+      machines   - Show Virtual Machines in use associated with harbor-wave.
       Based on VM tag in settings.
 
-      templates - Show available custom images.
+      templates  - Show available custom images.
   
-      regions   - List valid region codes for use in config
+      regions    - List valid region codes for use in config
   
-      vm-sizes  - List of valid vm size codes for use in config
+      vm-sizes   - List of valid vm size codes for use in config
+      
+      money-left - How much $$$ you have left on your DO account. So far,
+      you need to log in to the Web interface to add more $$$. Haven't worked
+      out replenish by API yet...
       
     example: harbor-wave list vm-sizes
 
@@ -156,7 +160,7 @@ def list_machines(loaded_config,terse=False):
     try:
         droplet_list = manager.get_all_droplets(tag_name=droplet_tag)
     except digitalocean.DataReadError:
-        exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
+        exit_with_error(1,"list: invalid api-key, authentication failed, check account")
     
     tab_spacing = 12
     header  = colors.bold + "Name\t\tRegion\tSize\t\tImage\t\tDatestamp".expandtabs(tab_spacing) + colors.reset
@@ -172,7 +176,7 @@ def list_machines(loaded_config,terse=False):
             out_line = droplet.name + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + droplet.created_at
             print(out_line)
     else:
-        exit_with_error(9,"list-droplets: terse is neither True nor False, should never get here, debug!")
+        exit_with_error(9,"list: machines: terse is neither True nor False, should never get here, debug!")
 
 def list_templates(loaded_config,terse=False):
     '''List available templates to make machines from. Takes one parameter, the config dict '''
@@ -188,7 +192,7 @@ def list_templates(loaded_config,terse=False):
     try:
         all_images = manager.get_my_images()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
+        exit_with_error(1,"list: invalid api-key, authentication failed, check account")
     
     # Seperate out user uploaded images
     use_images = []
@@ -219,7 +223,7 @@ def list_regions(loaded_config,terse=False):
     try:
         regions = manager.get_all_regions()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
+        exit_with_error(1,"list: invalid api-key, authentication failed, check account")
 
     #print
     tab_space = 13
@@ -232,7 +236,6 @@ def list_regions(loaded_config,terse=False):
 
 def list_sizes(loaded_config,terse=False):
     '''List Available VM sizes, needs config dict'''
-    # TODO List description and cost.
     # pre-flight tests
     if "api-key" not in loaded_config.keys():
         exit_with_error(2,"api-key not set. see --help on set.")
@@ -246,7 +249,7 @@ def list_sizes(loaded_config,terse=False):
     try:
         avail_sizes = manager.get_all_sizes()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
+        exit_with_error(1,"list: invalid api-key, authentication failed, check account")
     
     # print
     tab_space = 19
@@ -267,6 +270,31 @@ def list_sizes(loaded_config,terse=False):
             print(out_line)
     else:
         exit_with_error(9,"list: sizes - terse neither true nor false, should not be here, debug!")
+
+def list_account_balance(loaded_config,terse=False):
+    '''Shows how much money you have left in the account'''
+    '''List Available VM sizes, needs config dict'''
+    # pre-flight tests
+    if "api-key" not in loaded_config.keys():
+        exit_with_error(2,"api-key not set. see --help on set.")
+    api_key = loaded_config['api-key']
+    if check_api_key(api_key) != True:
+        exit_with_error(2,"Invalid API Key")
+        
+    # get VM sizes
+    manager = digitalocean.Manager(token=api_key)
+    
+    try:
+        funds = manager.get_balance()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list: invalid api-key, authentication failed, check account")    
+   
+    #print
+    if terse == False:
+        output = "Remaining Funds: $" + str(abs(float(funds.account_balance)))
+    elif terse == True:
+        output = "$" + str(abs(float(funds.account_balance)))
+    message(output)
 
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
@@ -519,6 +547,8 @@ def main():
             list_regions(loaded_config)
         elif option == "vm-sizes":
             list_sizes(loaded_config)
+        elif option == "money-left":
+            list_account_balance(loaded_config)
         else:
             exit_with_error(2,"list: Invalid option, see -help for options")
     else:

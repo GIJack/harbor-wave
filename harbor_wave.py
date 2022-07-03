@@ -198,7 +198,7 @@ def list_templates(loaded_config,terse=False):
             
     #now print
     tab_size = 15
-    banner="ID\tREGIONS\t\tDESCRIPTION".expandtabs(tab_size)
+    banner = colors.bold + "ID\tREGIONS\t\tDESCRIPTION".expandtabs(tab_size) + colors.reset
     print(banner)
     for image in use_images:
         out_line = str(image.id) + "\t" + ",".join(image.regions) + "\t\t" + image.name

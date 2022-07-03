@@ -220,7 +220,7 @@ def list_regions(loaded_config,terse=False):
         regions = manager.get_all_regions()
     except digitalocean.DataReadError:
         exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
-    
+
     #print
     tab_space = 13
     banner = colors.bold + "ID\t\tDESCRIPTION".expandtabs(tab_space) + colors.reset
@@ -229,6 +229,44 @@ def list_regions(loaded_config,terse=False):
         out_line = item.slug + "\t\t" + item.name
         out_line = out_line.expandtabs(tab_space)
         print(out_line)
+
+def list_sizes(loaded_config,terse=False):
+    '''List Available VM sizes, needs config dict'''
+    # TODO List description and cost.
+    # pre-flight tests
+    if "api-key" not in loaded_config.keys():
+        exit_with_error(2,"api-key not set. see --help on set.")
+    api_key = loaded_config['api-key']
+    if check_api_key(api_key) != True:
+        exit_with_error(2,"Invalid API Key")
+        
+    # get VM sizes
+    manager = digitalocean.Manager(token=api_key)
+    
+    try:
+        avail_sizes = manager.get_all_sizes()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
+    
+    # print
+    tab_space = 19
+    header = colors.bold + "SLUG\t\tCPU\tRAM\tDISK\t$$-HOUR".expandtabs(tab_space) + colors.reset
+    if terse == False:
+        print(header)
+        for item in avail_sizes:
+            if item.available != True:
+                continue
+            item_memory = item.memory / 1024
+            out_line = item.slug + "\t\t" + str(item.vcpus) + " CPU(s)\t" + str(item_memory) + "GB RAM\t" + str(item.disk) + "GB HD\t" + str(item.price_hourly)
+            out_line = out_line.expandtabs(tab_space)
+            print(out_line)
+    elif terse == True:
+        for item in avail_sizes:
+            item_memory = item.memory / 1024
+            out_line = item.slug + "," + str(item.vcpus) + "," + str(item_memory) + "," + str(item.disk) + "," + str(item.price_hourly)
+            print(out_line)
+    else:
+        exit_with_error(9,"list: sizes - terse neither true nor false, should not be here, debug!")
 
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
@@ -479,6 +517,8 @@ def main():
             list_templates(loaded_config)
         elif option == "regions":
             list_regions(loaded_config)
+        elif option == "vm-sizes":
+            list_sizes(loaded_config)
         else:
             exit_with_error(2,"list: Invalid option, see -help for options")
     else:

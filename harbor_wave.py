@@ -205,6 +205,31 @@ def list_templates(loaded_config,terse=False):
         out_line = out_line.expandtabs(tab_size)
         print(out_line)
 
+def list_regions(loaded_config,terse=False):
+    '''List region codes and descriptions for use in config, pass the config dict'''
+    # pre-flight tests
+    if "api-key" not in loaded_config.keys():
+        exit_with_error(2,"api-key not set. see --help on set.")
+    api_key = loaded_config['api-key']
+    if check_api_key(api_key) != True:
+        exit_with_error(2,"Invalid API Key")
+     
+    # get regions
+    manager = digitalocean.Manager(token=api_key)
+    try:
+        regions = manager.get_all_regions()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
+    
+    #print
+    tab_space = 13
+    banner = colors.bold + "ID\t\tDESCRIPTION".expandtabs(tab_space) + colors.reset
+    print(banner)
+    for item in regions:
+        out_line = item.slug + "\t\t" + item.name
+        out_line = out_line.expandtabs(tab_space)
+        print(out_line)
+
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
     api_file_name    = "api-key"
@@ -452,8 +477,10 @@ def main():
             list_machines(loaded_config)
         elif option == "templates":
             list_templates(loaded_config)
+        elif option == "regions":
+            list_regions(loaded_config)
         else:
-            exit_with_error(2,"Invalid option")
+            exit_with_error(2,"list: Invalid option, see -help for options")
     else:
         exit_with_error(2,"No such command. See --help")
 

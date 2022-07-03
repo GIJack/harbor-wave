@@ -55,7 +55,6 @@ and then edit ~/.config/harbor-wave
 
 ```
 harbor-wave set region <region_slug>
-harbor-wave set project <your_project_name>
 harbor-wave set api-key <your_do_api_key>
 harbor-wave set vm-base-name <base_name_for_vm>
 ```

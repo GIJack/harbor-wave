@@ -71,14 +71,20 @@ or delete with
 harbor-wave destroy [vm-name]
 ```
 
-List VMs in project
+List machines associated with harborwave, by tag(set tag)
+```
+harbor-wave list machines
+```
+List available config values, as pulled from DO servers:
+```
+harbor-wave list regions
+harbor-wave list vm-sizes
+harbor-wave list templates
+```
 
+Show you Digital Ocean account balance. NOTE, you cannot add funds via the API.
 ```
-harbor-wave list-machines
-```
-Avaible Templates:
-```
-harbor-wave list-templates
+harbor-wave list money-left
 ```
 
 For more info see either

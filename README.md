@@ -57,7 +57,10 @@ and then edit ~/.config/harbor-wave
 harbor-wave set region <region_slug>
 harbor-wave set api-key <your_do_api_key>
 harbor-wave set vm-base-name <base_name_for_vm>
+harbor-wave set ssh-key-n <N> #index of SSH key
 ```
+
+SSH key index, is a count-from-0 index
 
 you are ready to start spawning VMs with
 
@@ -80,6 +83,7 @@ List available config values, as pulled from DO servers:
 harbor-wave list regions
 harbor-wave list vm-sizes
 harbor-wave list templates
+harbor-wave list ssh-keys
 ```
 
 Show you Digital Ocean account balance. NOTE, you cannot add funds via the API.

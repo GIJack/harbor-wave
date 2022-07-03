@@ -27,7 +27,8 @@ Switches override config
   
       regions    - List valid region codes for use in config
       
-      ssh-keys   - List SSH-keys on the account
+      ssh-keys   - List SSH-keys on the account. use INDEX for ssh-key-n config
+      item with set
   
       vm-sizes   - List of valid vm size codes for use in config
       
@@ -65,10 +66,8 @@ Switches override config
    region  - digital ocean region code slug to spawn droplets. You can get a
    list of valid entries with the list-reigons command. Default: nyc1
    
-   ssh-key-n   - Interger, count from 0. Select which SSH key is being used to
-   access the VM. Should display in order on the DO website. This is the ssh
-   login key for root unless you have modified it with cloud-init. If you only
-   have one key, this is 0
+   ssh-key-n   - Interger, index of SSH keys to include when creating virtual
+   machines. see list ssh-keys
    
    tag         - tag to use for the droplets that harbor-wave will use to
    recognize its own. Default: harborwave
@@ -277,7 +276,37 @@ def list_account_balance(loaded_config,terse=False):
     elif terse == True:
         output = "$" + str(abs(float(funds.account_balance)))
     message(output)    
+
+def list_ssh_keys(loaded_config,terse=False):
+    '''List SSH keys registered to your digital ocean account'''
+        
+    # get VM sizes
+    manager = check_and_connect(loaded_config)
+    try:
+        ssh_keys = manager.get_all_sshkeys()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list: invalid api-key, authentication failed, check account")  
     
+    # Now print
+    tab_size =  18
+    header = colors.bold + "INDEX\tNAME\tFINGERPRINT".expandtabs(tab_size) + colors.reset
+    num_keys = len(ssh_keys)
+    if terse == False:
+        print(header)
+        for index in range(num_keys):
+            key = ssh_keys[index]
+            out_line = str(index) + '\t' + key.name + "\t" + key.fingerprint
+            out_line = out_line.expandtabs(tab_size)
+            print(out_line)
+    elif terse == True:
+        for index in range(num_keys):
+            key = ssh_keys[index]
+            out_line = str(index) + ',' + key.name + ',' + key.fingerprint
+            print(out_line)
+    else:
+        exit_with_error(9,"list ssh-keys: terse is neither true nor false, this should not be, debug!")
+        
+
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
     api_file_name    = "api-key"
@@ -526,6 +555,8 @@ def main():
             list_templates(loaded_config)
         elif option == "regions":
             list_regions(loaded_config)
+        elif option == "ssh-keys":
+            list_ssh_keys(loaded_config)
         elif option == "vm-sizes":
             list_sizes(loaded_config)
         elif option == "money-left":

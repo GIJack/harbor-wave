@@ -275,6 +275,8 @@ def list_account_balance(loaded_config,terse=False):
         output = "Remaining Funds: $" + str(abs(float(funds.account_balance)))
     elif terse == True:
         output = "$" + str(abs(float(funds.account_balance)))
+    else:
+        exit_with_error(9,"list: money left: terse neither True nor False, should not be here, debug!")
     message(output)    
 
 def list_ssh_keys(loaded_config,terse=False):

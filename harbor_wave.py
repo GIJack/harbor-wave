@@ -174,6 +174,37 @@ def list_machines(loaded_config,terse=False):
     else:
         exit_with_error(9,"list-droplets: terse is neither True nor False, should never get here, debug!")
 
+def list_templates(loaded_config,terse=False):
+    '''List available templates to make machines from. Takes one parameter, the config dict '''
+    # pre-flight tests
+    if "api-key" not in loaded_config.keys():
+        exit_with_error(2,"api-key not set. see --help on set.")
+    api_key = loaded_config['api-key']
+    if check_api_key(api_key) != True:
+        exit_with_error(2,"Invalid API Key")
+    
+    # get images
+    manager = digitalocean.Manager(token=api_key)
+    try:
+        all_images = manager.get_my_images()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list-droplets: invalid api-key, authentication failed, check account")
+    
+    # Seperate out user uploaded images
+    use_images = []
+    for image in all_images:
+        if image.type == "custom":
+            use_images.append(image)
+            
+    #now print
+    tab_size = 10
+    banner="ID\t\tREIGONS\t\t\tDESCRIPTION".expandtabs(tab_size)
+    print(banner)
+    for image in use_images:
+        out_line = str(image.id) + "\t\t" + ",".join(image.regions) + "\t\t\t" + image.name
+        out_line = out_line.expandtabs(tab_size)
+        print(out_line)
+
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
     api_file_name    = "api-key"
@@ -419,6 +450,8 @@ def main():
             sys.exit(4)
         elif option == "machines":
             list_machines(loaded_config)
+        elif option == "templates":
+            list_templates(loaded_config)
         else:
             exit_with_error(2,"Invalid option")
     else:

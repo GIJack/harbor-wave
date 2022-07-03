@@ -26,6 +26,8 @@ Switches override config
       templates  - Show available custom images.
   
       regions    - List valid region codes for use in config
+      
+      ssh-keys   - List SSH-keys on the account
   
       vm-sizes   - List of valid vm size codes for use in config
       
@@ -141,6 +143,19 @@ def check_api_key(key):
     # No more tests
     return True
 
+def check_and_connect(loaded_config):
+    '''give the loaded config, check the API key, and return a DO manager session'''
+    if "api-key" not in loaded_config.keys():
+        exit_with_error(2,"api-key not set. see --help on set.")
+    api_key = loaded_config['api-key']
+    if check_api_key(api_key) != True:
+        exit_with_error(2,"Invalid API Key")
+        
+    # get open a session
+    manager = digitalocean.Manager(token=api_key)
+    
+    return manager
+
 def list_machines(loaded_config,terse=False):
     '''give a list of droplets in project, nomially ones created with this prog.
     if terse is True, then print in CSV format for grep and cut'''
@@ -148,15 +163,10 @@ def list_machines(loaded_config,terse=False):
     # pre-flight tests
     if "tag" not in loaded_config.keys():
         exit_with_error(2,"Droplet tag not set in config. see --help for set and tag item")
-    if "api-key" not in loaded_config.keys():
-        exit_with_error(2,"api-key not set. see --help on set.")
     droplet_tag = loaded_config['tag']
-    api_key     = loaded_config['api-key']
-    if check_api_key(api_key) != True:
-        exit_with_error(2,"Invalid API Key")
-    
+
     #lets go
-    manager = digitalocean.Manager(token=api_key)
+    manager = check_and_connect(loaded_config)
     try:
         droplet_list = manager.get_all_droplets(tag_name=droplet_tag)
     except digitalocean.DataReadError:
@@ -179,16 +189,9 @@ def list_machines(loaded_config,terse=False):
         exit_with_error(9,"list: machines: terse is neither True nor False, should never get here, debug!")
 
 def list_templates(loaded_config,terse=False):
-    '''List available templates to make machines from. Takes one parameter, the config dict '''
-    # pre-flight tests
-    if "api-key" not in loaded_config.keys():
-        exit_with_error(2,"api-key not set. see --help on set.")
-    api_key = loaded_config['api-key']
-    if check_api_key(api_key) != True:
-        exit_with_error(2,"Invalid API Key")
-    
+    '''List available templates to make machines from. Takes one parameter, the config dict '''    
     # get images
-    manager = digitalocean.Manager(token=api_key)
+    manager = check_and_connect(loaded_config)
     try:
         all_images = manager.get_my_images()
     except digitalocean.DataReadError:
@@ -211,15 +214,9 @@ def list_templates(loaded_config,terse=False):
 
 def list_regions(loaded_config,terse=False):
     '''List region codes and descriptions for use in config, pass the config dict'''
-    # pre-flight tests
-    if "api-key" not in loaded_config.keys():
-        exit_with_error(2,"api-key not set. see --help on set.")
-    api_key = loaded_config['api-key']
-    if check_api_key(api_key) != True:
-        exit_with_error(2,"Invalid API Key")
-     
+
     # get regions
-    manager = digitalocean.Manager(token=api_key)
+    manager = check_and_connect(loaded_config)
     try:
         regions = manager.get_all_regions()
     except digitalocean.DataReadError:
@@ -236,16 +233,9 @@ def list_regions(loaded_config,terse=False):
 
 def list_sizes(loaded_config,terse=False):
     '''List Available VM sizes, needs config dict'''
-    # pre-flight tests
-    if "api-key" not in loaded_config.keys():
-        exit_with_error(2,"api-key not set. see --help on set.")
-    api_key = loaded_config['api-key']
-    if check_api_key(api_key) != True:
-        exit_with_error(2,"Invalid API Key")
-        
-    # get VM sizes
-    manager = digitalocean.Manager(token=api_key)
     
+    # get VM sizes
+    manager = check_and_connect(loaded_config)
     try:
         avail_sizes = manager.get_all_sizes()
     except digitalocean.DataReadError:
@@ -273,17 +263,9 @@ def list_sizes(loaded_config,terse=False):
 
 def list_account_balance(loaded_config,terse=False):
     '''Shows how much money you have left in the account'''
-    '''List Available VM sizes, needs config dict'''
-    # pre-flight tests
-    if "api-key" not in loaded_config.keys():
-        exit_with_error(2,"api-key not set. see --help on set.")
-    api_key = loaded_config['api-key']
-    if check_api_key(api_key) != True:
-        exit_with_error(2,"Invalid API Key")
         
-    # get VM sizes
-    manager = digitalocean.Manager(token=api_key)
-    
+    # get funds
+    manager = check_and_connect(loaded_config)
     try:
         funds = manager.get_balance()
     except digitalocean.DataReadError:
@@ -294,8 +276,8 @@ def list_account_balance(loaded_config,terse=False):
         output = "Remaining Funds: $" + str(abs(float(funds.account_balance)))
     elif terse == True:
         output = "$" + str(abs(float(funds.account_balance)))
-    message(output)
-
+    message(output)    
+    
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
     api_file_name    = "api-key"
@@ -549,7 +531,7 @@ def main():
         elif option == "money-left":
             list_account_balance(loaded_config)
         else:
-            exit_with_error(2,"list: Invalid option, see -help for options")
+            exit_with_error(2,"list: Invalid option, see --help for options")
     else:
         exit_with_error(2,"No such command. See --help")
 

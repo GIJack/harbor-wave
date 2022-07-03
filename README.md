@@ -5,10 +5,13 @@ STATUS: in progress. get,set,print-config, and list commmands all implemented
 and usable. TODO: create/destroy
 
 Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
-service, to rapidly spin up and destroy custom templates. Based on a digital
-ocean API python lib:
+service, to rapidly spin up and destroy droplets based on custom templates.
+Based on a digital Ocean API python lib:
 
 https://github.com/koalalorenzo/python-digitalocean
+
+created with custom templates created by disk-image-scripts in mind:
+https://github.com/GIJack/disk-image-scripts
 
 Steps
 ====

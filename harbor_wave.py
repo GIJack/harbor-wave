@@ -177,7 +177,7 @@ def list_machines(loaded_config,terse=False):
     if terse == False:
         print(header)
         for droplet in droplet_list:
-            out_line = droplet.name + "\t" + droplet.ip_address + "\t" + droplet.region['slug'] + "\t" + droplet.size['slug'] + "\t" + droplet.image['name'] + "\t" + droplet.created_at
+            out_line = droplet.name + "\t" + str(droplet.ip_address) + "\t" + droplet.region['slug'] + "\t" + droplet.size['slug'] + "\t" + droplet.image['name'] + "\t" + droplet.created_at
             out_line = out_line.expandtabs(tab_spacing)
             print(out_line)
     elif terse == True:

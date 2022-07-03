@@ -495,7 +495,6 @@ def main():
         warn("could not load config, all options must be specified on command line or harbor-wave will fail")
     
     # Now apply command line switch options
-    
     if args.api_key != None:
         loaded_config['api-key']       = args.api_key
     if args.domain != None:

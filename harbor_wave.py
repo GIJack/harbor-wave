@@ -197,11 +197,11 @@ def list_templates(loaded_config,terse=False):
             use_images.append(image)
             
     #now print
-    tab_size = 10
-    banner="ID\t\tREIGONS\t\t\tDESCRIPTION".expandtabs(tab_size)
+    tab_size = 15
+    banner="ID\tREGIONS\t\tDESCRIPTION".expandtabs(tab_size)
     print(banner)
     for image in use_images:
-        out_line = str(image.id) + "\t\t" + ",".join(image.regions) + "\t\t\t" + image.name
+        out_line = str(image.id) + "\t" + ",".join(image.regions) + "\t\t" + image.name
         out_line = out_line.expandtabs(tab_size)
         print(out_line)
 

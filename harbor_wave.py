@@ -149,7 +149,7 @@ def check_and_connect(loaded_config):
     needed_keys = ("api-key","domain","region","ssh-key-n","vm-base-name","vm-size","vm-template","use-dns")
     for key in needed_keys:
         if key not in loaded_config.keys():
-            exit_with_error(key + " not set. see --help on set")
+            exit_with_error(2,key + " not set. see --help on set")
     
     api_key = loaded_config['api-key']
     if check_api_key(api_key) != True:
@@ -164,7 +164,6 @@ def list_machines(loaded_config,terse=False):
     '''give a list of droplets in project, nomially ones created with this prog.
     if terse is True, then print in CSV format for grep and cut'''
     
-
     manager = check_and_connect(loaded_config)
     droplet_tag = loaded_config['tag']
     try:

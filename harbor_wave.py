@@ -307,7 +307,25 @@ def list_ssh_keys(loaded_config,terse=False):
             print(out_line)
     else:
         exit_with_error(9,"list ssh-keys: terse is neither true nor false, this should not be, debug!")
-        
+
+def create_machine(loaded_config,machine_name):
+    '''Creates a single virtual-machine, uses machine_name variable for name,
+    ignores vm-base-name in config. This is a base class that does no checking
+    or iteration. Also does not mess with DNS
+    '''
+    
+    manager  = check_and_connect(loaded_config)
+    all_ssh_keys = manager.get_all_sshkeys()
+    key_n   = loaded_config['ssh-key-n']
+    use_key = all_ssh_keys[ssh_key_n]
+    new_vm  = digitalocean.Droplet(token=loaded_config['api-token'],
+                                    name=machine_name,
+                                    region=loaded_config['region'],
+                                    image=loaded_config['vm-template'],
+                                    size_slug=loaded_config['vm-size'],
+                                    tags=[ loaded_config['tag'] ],
+                                    ssh_keys= [ use_key ],
+                                    backups=False )
 
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''

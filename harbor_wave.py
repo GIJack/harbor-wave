@@ -242,7 +242,7 @@ def list_sizes(loaded_config,terse=False):
     
     # print
     tab_space = 19
-    header = colors.bold + "SLUG\t\tCPU\tRAM\tDISK\t$$-HOUR".expandtabs(tab_space) + colors.reset
+    header = colors.bold + "NAME\t\tCPU\tRAM\tDISK\t$$-HOUR".expandtabs(tab_space) + colors.reset
     if terse == False:
         print(header)
         for item in avail_sizes:

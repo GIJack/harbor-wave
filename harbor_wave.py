@@ -171,18 +171,18 @@ def list_machines(loaded_config,terse=False):
     except digitalocean.DataReadError:
         exit_with_error(1,"list: invalid api-key, authentication failed, check account")
     
-    tab_spacing = 12
-    header  = colors.bold + "Name\t\tRegion\tSize\t\tImage\t\tDatestamp".expandtabs(tab_spacing) + colors.reset
+    tab_spacing = 20
+    header  = colors.bold + "NAME\tIP ADDRESS\tREGION\tSIZE\tTEMPLATE\t\tDATESTAMP".expandtabs(tab_spacing) + colors.reset
     out_line = ""
     if terse == False:
         print(header)
         for droplet in droplet_list:
-            out_line = droplet.name + "\t" + droplet.region['slug'] + "\t" + droplet.size['slug'] + "\t\t" + droplet.image['name'] + "\t\t" + droplet.created_at
+            out_line = droplet.name + "\t" + droplet.ip_address + "\t" + droplet.region['slug'] + "\t" + droplet.size['slug'] + "\t" + droplet.image['name'] + "\t" + droplet.created_at
             out_line = out_line.expandtabs(tab_spacing)
             print(out_line)
     elif terse == True:
         for droplet in droplet_list:
-            out_line = droplet.name + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + droplet.created_at
+            out_line = droplet.name + "," + droplet.ip_address + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + droplet.created_at
             print(out_line)
     else:
         exit_with_error(9,"list: machines: terse is neither True nor False, should never get here, debug!")
@@ -567,7 +567,7 @@ def main():
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
         if option == "help":
-            message("list:  valid options are machines, templates, regions, and vm-sizes. see --help for more info")
+            message("list:  valid options are machines, templates, regions, vm-sizes, and money-left. see --help for more info")
             sys.exit(4)
         elif option == "machines":
             list_machines(loaded_config)

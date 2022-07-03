@@ -29,7 +29,7 @@ Switches override config
   
       vm-sizes  - List of valid vm size codes for use in config
       
-    example: harbor_wave list vm-sizes
+    example: harbor-wave list vm-sizes
 
   spawn <N> - Create a new N new VMs. default is 1
 

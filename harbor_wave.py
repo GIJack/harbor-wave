@@ -144,8 +144,13 @@ def check_api_key(key):
 
 def check_and_connect(loaded_config):
     '''give the loaded config, check the API key, and return a DO manager session'''
-    if "api-key" not in loaded_config.keys():
-        exit_with_error(2,"api-key not set. see --help on set.")
+    
+    # check to make sure we have the right config options
+    needed_keys = ("api-key","domain","region","ssh-key-n","vm-base-name","vm-size","vm-template","use-dns")
+    for key in needed_keys:
+        if key not in loaded_config.keys():
+            exit_with_error(key + " not set. see --help on set")
+    
     api_key = loaded_config['api-key']
     if check_api_key(api_key) != True:
         exit_with_error(2,"Invalid API Key")
@@ -159,13 +164,9 @@ def list_machines(loaded_config,terse=False):
     '''give a list of droplets in project, nomially ones created with this prog.
     if terse is True, then print in CSV format for grep and cut'''
     
-    # pre-flight tests
-    if "tag" not in loaded_config.keys():
-        exit_with_error(2,"Droplet tag not set in config. see --help for set and tag item")
-    droplet_tag = loaded_config['tag']
 
-    #lets go
     manager = check_and_connect(loaded_config)
+    droplet_tag = loaded_config['tag']
     try:
         droplet_list = manager.get_all_droplets(tag_name=droplet_tag)
     except digitalocean.DataReadError:

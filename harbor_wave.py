@@ -42,16 +42,16 @@ Switches override config
 
   spawn <N> - Create a new N new VMs. default is 1
 
-  destroy [VM Names] - Destroy Name VMs. List of names. the ALL tag will destroy
-  all VMs associated with harborwave as determined by having the right VM tag.
-
+  destroy <"ALL">- Destroy VMs. If ALL is appended, then all harbor-wave VMs
+  will be destroyed, based on tag.
+  
   set [property] - set a config item. See bellow for list of config items
 
   get [property] - print value for item, see bellow for list of config items
   
   print-config   - print all config items in pretty table.
 
-  touch         - Stop after proccessing initial config. useful for generating
+  touch          - Stop after proccessing initial config. useful for generating
   blank config file. Will not touch the api-key
 
         CONFIG ITEMS:
@@ -398,10 +398,10 @@ def spawn_machines(loaded_config,N=1):
     fails = 0
     for i in range(N):
         vm_name  = loaded_config['vm-base-name'] + str(i)
-        msg_line = "Created: " + vm_name
+        msg_line = vm_name + "created"
         try:
             create_machine(loaded_config,vm_name,use_key)
-            print(msg_line)
+            submsg(msg_line)
         except:
             warn("spawn: could not create machine " + vm_name)
             fails += 1
@@ -412,14 +412,14 @@ def spawn_machines(loaded_config,N=1):
         message("Done")
     
 
-def destroy_machines(loaded_config,del_machine_list):
+def destroy_machines(loaded_config,args=[]):
     '''delete virtual machine(s). Deletes machines specified by a list
     of matching machine names. If ALL is specified instead of a list
     all machines with the configured tag will be deleted'''
 
-    #check list of 
-    manager = check_and_connect(loaded_config)
-    vm_tag = loaded_config['tag']
+    manager   = check_and_connect(loaded_config)
+    vm_tag    = loaded_config['tag']
+    base_name = loaded_config['vm-base-name']
     
     # get a list of machines to delete
     try:
@@ -430,17 +430,17 @@ def destroy_machines(loaded_config,del_machine_list):
     # Sort out what needs to be deleted
     delete_machines       = []
     delete_machines_names = []
-    if del_machine_list == [ "ALL" ]:
+    if "ALL" in args:
         delete_machines = running_machine_list
         banner = "Deleting ALL Machines"
     else:
         for item in running_machine_list:
-            if item.name in del_machine_list:
+            if item.name.startswith(base_name):
                 delete_machines.append(item)
                 delete_machines_names.append(item.name)
         
         delete_machines_text = ",".join(delete_machines_names)
-        banner = "Deleting Machines: " + delete_machines_text
+        banner = "Deleting Machine Series: " + basename
     
     message(banner)
     for item in delete_machines:
@@ -691,6 +691,8 @@ def main():
         option = args.arguments[0]
         if len(args.arguments) >= 2:
             flags = args.arguments[1:]
+        else:
+            flags = []
         if "terse" in flags:
             terse = True
         
@@ -718,10 +720,11 @@ def main():
         else:
             spawn_machines(loaded_config)
     elif args.command == "destroy":
-        if len(args.arguments) < 1:
-            exit_with_error(2,"destroy: Destroy what? either a list of machines or ALL")
-        target = args.arguments
-        destroy_machines(loaded_config,target)
+        if len(args.arguments) >= 1:
+            options = args.arguments
+        else:
+            options = []
+        destroy_machines(loaded_config,options)
     else:
         exit_with_error(2,"No such command. See --help")
 

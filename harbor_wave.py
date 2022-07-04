@@ -17,7 +17,7 @@ Switches override config
 
 			COMMANDS:
 
-  help - this text
+  help - brief overview
 
   list [what] - list things. You may add terse to the argument at the end for
   CSV list of values instead of a tabbed table
@@ -45,9 +45,9 @@ Switches override config
   destroy <"ALL">- Destroy VMs. If ALL is appended, then all harbor-wave VMs
   will be destroyed, based on tag.
   
-  set [property] - set a config item. See bellow for list of config items
+  set [item] [value] - set a config item. See bellow for list of config items
 
-  get [property] - print value for item, see bellow for list of config items
+  get [item] - print value for item, see bellow for list of config items
   
   print-config   - print all config items in pretty table.
 
@@ -669,6 +669,9 @@ def main():
     # Lets roll. Commands do their own checks
     if args.command == None:
         exit_with_error(2,"No command given, see --help")
+    elif args.command == "help":
+        message("Syntax is harbor-wave [--options] <command> [arguments]. see --help for more info")
+        sys.exit(0)
     elif args.command == "touch":
         sys.exit(0)
     elif args.command == "set":

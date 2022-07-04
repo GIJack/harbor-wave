@@ -118,6 +118,9 @@ def message(message):
 def exit_with_error(exit,message):
     print("harbor-wave" + colors.red + colors.bold + " ¡ERROR!: " + colors.reset + message, file=sys.stderr)
     sys.exit(exit)
+
+def submsg(message):
+    print("[+]\t" + message)
     
 def warn(message):
     print("harbor-wave:" + colors.yellow + colors.bold + " ¡WARN!: " + colors.reset + message, file=sys.stderr)
@@ -141,7 +144,28 @@ def check_api_key(key):
         return False
     # No more tests
     return True
-
+    
+def check_dns(loaded_config):
+    '''Check if domain is usable for DNS, ignores use-dns, returns True of False'''
+    
+    manager = check_and_connect(loaded_config)
+    
+    try:
+        all_domains = manager.get_all_domains()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list: DataReadError, check settings and try again")
+        
+    # make a list with just the names
+    domain_list = []
+    for item in all_domains:
+        domain_list.append(item.name)
+    
+    # Check if config lines up with what is on DO
+    if loaded_config['domain'] in domain_list:
+        return True
+    else:
+        return False
+        
 def check_and_connect(loaded_config):
     '''give the loaded config, check the API key, and return a DO manager session'''
     
@@ -169,7 +193,7 @@ def list_machines(loaded_config,terse=False):
     try:
         droplet_list = manager.get_all_droplets(tag_name=droplet_tag)
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: invalid api-key, authentication failed, check account")
+        exit_with_error(1,"list: DataReadError, check settings and try again")
     
     tab_spacing = 20
     header  = colors.bold + "NAME\tIP ADDRESS\tREGION\tSIZE\tTEMPLATE\t\tDATESTAMP".expandtabs(tab_spacing) + colors.reset
@@ -185,7 +209,7 @@ def list_machines(loaded_config,terse=False):
             out_line = droplet.name + "," + droplet.ip_address + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + droplet.created_at
             print(out_line)
     else:
-        exit_with_error(9,"list: machines: terse is neither True nor False, should never get here, debug!")
+        exit_with_error(10,"list: machines: terse is neither True nor False, should never get here, debug!")
 
 def list_templates(loaded_config,terse=False):
     '''List available templates to make machines from. Takes one parameter, the config dict '''    
@@ -194,7 +218,7 @@ def list_templates(loaded_config,terse=False):
     try:
         all_images = manager.get_my_images()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: invalid api-key, authentication failed, check account")
+        exit_with_error(1,"list: DataReadError, check settings and try again")
     
     # Seperate out user uploaded images
     use_images = []
@@ -219,7 +243,7 @@ def list_regions(loaded_config,terse=False):
     try:
         regions = manager.get_all_regions()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: invalid api-key, authentication failed, check account")
+        exit_with_error(1,"list: DataReadError, check settings and try again")
 
     #print
     tab_space = 13
@@ -238,7 +262,7 @@ def list_sizes(loaded_config,terse=False):
     try:
         avail_sizes = manager.get_all_sizes()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: invalid api-key, authentication failed, check account")
+        exit_with_error(1,"list: DataReadError, check settings and try again")
     
     # print
     tab_space = 19
@@ -258,7 +282,7 @@ def list_sizes(loaded_config,terse=False):
             out_line = item.slug + "," + str(item.vcpus) + "," + str(item_memory) + "," + str(item.disk) + "," + str(item.price_hourly)
             print(out_line)
     else:
-        exit_with_error(9,"list: sizes - terse neither true nor false, should not be here, debug!")
+        exit_with_error(10,"list: sizes - terse neither true nor false, should not be here, debug!")
 
 def list_account_balance(loaded_config,terse=False):
     '''Shows how much money you have left in the account'''
@@ -268,15 +292,20 @@ def list_account_balance(loaded_config,terse=False):
     try:
         funds = manager.get_balance()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: invalid api-key, authentication failed, check account")    
+        exit_with_error(1,"list: DataReadError, check settings and try again")    
    
+    # some back-of-the-napkin math
+    used_so_far = float(funds.month_to_date_usage)
+    balance     = abs(float(funds.account_balance))
+    remaining   = round(balance - used_so_far,2)
+    
     #print
     if terse == False:
-        output = "Remaining Funds: $" + str(abs(float(funds.account_balance)))
+        output = "Remaining Funds: $" + str(remaining)
     elif terse == True:
-        output = "$" + str(abs(float(funds.account_balance)))
+        output = "$" + str(remaining)
     else:
-        exit_with_error(9,"list: money left: terse neither True nor False, should not be here, debug!")
+        exit_with_error(10,"list: money left: terse neither True nor False, should not be here, debug!")
     message(output)    
 
 def list_ssh_keys(loaded_config,terse=False):
@@ -287,7 +316,7 @@ def list_ssh_keys(loaded_config,terse=False):
     try:
         ssh_keys = manager.get_all_sshkeys()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: invalid api-key, authentication failed, check account")  
+        exit_with_error(1,"list: DataReadError, check settings and try again")  
     
     # Now print
     tab_size =  18
@@ -306,26 +335,118 @@ def list_ssh_keys(loaded_config,terse=False):
             out_line = str(index) + ',' + key.name + ',' + key.fingerprint
             print(out_line)
     else:
-        exit_with_error(9,"list ssh-keys: terse is neither true nor false, this should not be, debug!")
+        exit_with_error(10,"list ssh-keys: terse is neither true nor false, this should not be, debug!")
 
-def create_machine(loaded_config,machine_name):
+def create_machine(loaded_config,machine_name,ssh_key):
     '''Creates a single virtual-machine, uses machine_name variable for name,
     ignores vm-base-name in config. This is a base class that does no checking
-    or iteration. Also does not mess with DNS
+    or iteration. must also pass the SSH key, to only have to load it once
+    Also does not mess with DNS. returns True or False, depending on if success
+    or not
     '''
     
     manager  = check_and_connect(loaded_config)
-    all_ssh_keys = manager.get_all_sshkeys()
-    key_n   = loaded_config['ssh-key-n']
-    use_key = all_ssh_keys[ssh_key_n]
-    new_vm  = digitalocean.Droplet(token=loaded_config['api-token'],
+    new_vm  = digitalocean.Droplet(token=loaded_config['api-key'],
                                     name=machine_name,
                                     region=loaded_config['region'],
                                     image=loaded_config['vm-template'],
                                     size_slug=loaded_config['vm-size'],
                                     tags=[ loaded_config['tag'] ],
-                                    ssh_keys= [ use_key ],
+                                    ssh_keys= [ ssh_key ],
                                     backups=False )
+    new_vm.create()
+
+def create_dns(loaded_config,vm_name,ip_address):
+    '''Update DNS for new virtual machine, assumes domain is valid, check first'''
+
+    api_key     = loaded_config['api-key']
+    domain_name = loaded_config['domain']
+    domain_obj  = digitalocean.Domain(token=api_key, name=domain)
+    new_record  = domain_obj.create_new_domain_record(type="A", name=vm_name, data=ip_address)
+    return new_record
+
+def spawn_machines(loaded_config,N=1):
+    '''the spawn command. takes the config dict and N, int number of machines'''
+    
+    manager = check_and_connect(loaded_config)
+    
+    #Some more checks
+    if len(loaded_config["vm-base-name"]) < 1:
+        exit_with_error(2,"spawn: vm-base-name needs to be at least one char for this to work!")
+    try:
+        N = int(N)
+    except:
+        exit_with_error(2,"spawn: N needs to be an interger")
+    # Get ssh keys
+    try:
+        all_ssh_keys = manager.get_all_sshkeys()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"spawn: DataReadError, check settings and try again")
+    key_n   = loaded_config['ssh-key-n']
+    use_key = all_ssh_keys[key_n]
+    
+    if loaded_config['use-dns'] == True:
+        warn("use-dns is not implemented yet, will be ignored") #TODO, finish domains
+        if check_dns(loaded_config['domain']) == False:
+            exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
+
+    banner = "spawning " + str(N) + " VM(s)"
+    message(banner)
+    # spawn N machines
+    fails = 0
+    for i in range(N):
+        vm_name  = loaded_config['vm-base-name'] + str(i)
+        msg_line = "Created: " + vm_name
+        try:
+            create_machine(loaded_config,vm_name,use_key)
+            print(msg_line)
+        except:
+            warn("spawn: could not create machine " + vm_name)
+            fails += 1
+    
+    if fails >= 1:
+        message("Done, but with " + str(fails) + " failures" )
+    else:
+        message("Done")
+    
+
+def destroy_machines(loaded_config,del_machine_list):
+    '''delete virtual machine(s). Deletes machines specified by a list
+    of matching machine names. If ALL is specified instead of a list
+    all machines with the configured tag will be deleted'''
+
+    #check list of 
+    manager = check_and_connect(loaded_config)
+    vm_tag = loaded_config['tag']
+    
+    # get a list of machines to delete
+    try:
+        running_machine_list = manager.get_all_droplets(tag_name=vm_tag)
+    except:
+        exit_with_error(1,"destroy: could NOT get list of machines, exiting")
+    
+    # Sort out what needs to be deleted
+    delete_machines       = []
+    delete_machines_names = []
+    if del_machine_list == [ "ALL" ]:
+        delete_machines = running_machine_list
+        banner = "Deleting ALL Machines"
+    else:
+        for item in running_machine_list:
+            if item.name in del_machine_list:
+                delete_machines.append(item)
+                delete_machines_names.append(item.name)
+        
+        delete_machines_text = ",".join(delete_machines_names)
+        banner = "Deleting Machines: " + delete_machines_text
+    
+    message(banner)
+    for item in delete_machines:
+        try:
+            item.destroy()
+            submsg(item.name + " destroyed")
+        except:
+            warn("Could not destroy" + item.name)
 
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
@@ -333,9 +454,9 @@ def set_config(config_dir,loaded_config,item,value):
     config_file_name = "harbor-wave.cfg"
     api_file         = config_dir + "/" + api_file_name
     config_file      = config_dir + "/" + config_file_name
-    set_item_str     = ("api-key","domain", "vm-base-name","project","vm-size","region","vm-template", "tag")
-    set_item_int     = ("ssh-key-n")
-    set_item_bool    = ("use-dns")
+    set_item_str     = ["api-key","domain", "vm-base-name","project","vm-size","region","vm-template", "tag"]
+    set_item_int     = ["ssh-key-n"]
+    set_item_bool    = ["use-dns"]
     all_set_items    = set_item_str + set_item_int + set_item_bool
     
     ## check if valid
@@ -566,6 +687,11 @@ def main():
         if len(args.arguments) < 1:
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
+        if len(args.arguments) >= 2:
+            flags = args.arguments[1:]
+        if "terse" in flags:
+            terse = True
+        
         if option == "help":
             message("list:  valid options are machines, templates, regions, vm-sizes, and money-left. see --help for more info")
             sys.exit(4)
@@ -583,6 +709,17 @@ def main():
             list_account_balance(loaded_config)
         else:
             exit_with_error(2,"list: Invalid option, see --help for options")
+    elif args.command == "spawn":
+        if len(args.arguments) >= 1:
+            N = args.arguments[0]
+            spawn_machines(loaded_config,N)
+        else:
+            spawn_machines(loaded_config)
+    elif args.command == "destroy":
+        if len(args.arguments) < 1:
+            exit_with_error(2,"destroy: Destroy what? either a list of machines or ALL")
+        target = args.arguments
+        destroy_machines(loaded_config,target)
     else:
         exit_with_error(2,"No such command. See --help")
 

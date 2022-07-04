@@ -49,7 +49,8 @@ Switches override config
 
   get [item] - print value for item, see bellow for list of config items
   
-  print-config   - print all config items in pretty table.
+  print-config   - print all config items in pretty table. if terse is specified
+  return CSV list instead of a tabbed table.
 
   touch          - Stop after proccessing initial config. useful for generating
   blank config file. Will not touch the api-key
@@ -61,11 +62,8 @@ Switches override config
    api-key file
 
    domain      - DNS domain to use if use-dns is set True
-   
-   project - digital ocean project name. Optional, but must exist if set.
-   Droplets created with spawn will be added to this project.
 
-   region  - digital ocean region code slug to spawn droplets. You can get a
+   region      - digital ocean region code slug to spawn droplets. You can get a
    list of valid entries with the list-reigons command. Default: nyc1
    
    ssh-key-n   - Interger, index of SSH keys to include when creating virtual
@@ -78,11 +76,11 @@ Switches override config
    is spawned, this will be the base, and new names will be incremented. At
    current this will be numeric. Might change in the future(perhaps name-sets)
    
-   vm-size     - Size code for how big the droplet should be.  See list-vm-sizes
-   for list of size codes. Default: s-1vcpu-1gb.
+   vm-size     - Size code new droplets.  See list vm-sizes for list of size
+   codes and their descriptions. Default: s-1vcpu-1gb.
    
    vm-template - ID of the custom template image for spawning droplets. You can
-   get a list of valid values with list-templates
+   get a list of valid values with list templates
    
    use-dns     - Use fully qualified domain names for droplet host names, and
    set DNS in network settings. True or False. This domain MUST EXIST on your
@@ -635,6 +633,7 @@ def main():
     parser.add_argument("-g","--tag"                 ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
     parser.add_argument("-k","--ssh-key-n"           ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
     parser.add_argument("-n","--vm-base-name"        ,help="Base Name For New VMs",type=str)
+    parser.add_argument("-r","--region"              ,help="Region code. Specify what datacenter this goes in",type=str)
     parser.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
     parser.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)
     parser.add_argument("-u","--use-dns"             ,help="Use FQDNs for naming VMs and add DNS entries in Networking",action="store_true")
@@ -655,6 +654,8 @@ def main():
         loaded_config['domain']        = args.domain
     if args.tag != None:
         loaded_config['tag']           = args.tag
+    if args.region != None:
+        loaded.config['region']        = args.region
     if args.ssh_key_n != None:
         loaded_config['ssh-key-n']     = args.ssh_key_n
     if args.vm_base_name != None:

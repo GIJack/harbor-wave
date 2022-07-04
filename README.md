@@ -67,8 +67,9 @@ SSH key index, is a count-from-0 index
 you are ready to start spawning VMs with
 
 ```
-harbor-wave spawn
+harbor-wave spawn <N>
 ```
+N is optional. Its a count of machines to spin up
 
 or delete with
 

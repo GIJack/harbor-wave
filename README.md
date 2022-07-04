@@ -1,8 +1,8 @@
 harbor-wave
 =============
 
-STATUS: in progress. get,set,print-config, and list commmands all implemented
-and usable. TODO: create/destroy
+STATUS: early-alpha. All commands now implemented, largely untested and
+documentation and autocomplete not done
 
 Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
 service, to rapidly spin up and destroy droplets based on custom templates.

@@ -1,8 +1,10 @@
 harbor-wave
 =============
 
-STATUS: early-alpha. All commands now implemented, largely untested and
-documentation and autocomplete not done
+STATUS: early-alpha. All commands now implemented, man page is rough draft,
+still need bash completion, not really tested.
+
+REPORT ALL BUGS
 
 Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
 service, to rapidly spin up and destroy droplets based on custom templates.

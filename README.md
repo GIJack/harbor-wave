@@ -88,6 +88,8 @@ harbor-wave list vm-sizes
 harbor-wave list templates
 harbor-wave list ssh-keys
 ```
+You may add terse at the end of a list command for a CSV list instead of tabbed
+tables
 
 Show you Digital Ocean account balance. NOTE, you cannot add funds via the API.
 ```

@@ -19,7 +19,9 @@ Switches override config
 
   help - this text
 
-  list [what] - list various things. Subcommands/arguments:
+  list [what] - list things. You may add terse to the argument at the end for
+  CSV list of values instead of a tabbed table
+  Subcommands/arguments:
       machines   - Show Virtual Machines in use associated with harbor-wave.
       Based on VM tag in settings.
 

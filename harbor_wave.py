@@ -247,12 +247,19 @@ def list_regions(loaded_config,terse=False):
 
     #print
     tab_space = 13
-    banner = colors.bold + "ID\t\tDESCRIPTION".expandtabs(tab_space) + colors.reset
-    print(banner)
-    for item in regions:
-        out_line = item.slug + "\t\t" + item.name
-        out_line = out_line.expandtabs(tab_space)
-        print(out_line)
+    banner = colors.bold + "ID\tDESCRIPTION".expandtabs(tab_space) + colors.reset
+    if terse == False:
+        print(banner)
+        for item in regions:
+            out_line = item.slug + "\t" + item.name
+            out_line = out_line.expandtabs(tab_space)
+            print(out_line)
+    elif terse == True:
+        for item in regions:
+            out_line = item.slug + "," + item.name
+            print(out_line)
+    else:
+        exit_with_error(10,"list: regions: terse neither true nor false, should not be, debug!")
 
 def list_sizes(loaded_config,terse=False):
     '''List Available VM sizes, needs config dict'''

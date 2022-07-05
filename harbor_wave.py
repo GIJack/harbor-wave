@@ -227,13 +227,20 @@ def list_templates(loaded_config,terse=False):
             use_images.append(image)
             
     #now print
-    tab_size = 25
-    banner = colors.bold + "ID\tREGIONS\t\tDESCRIPTION".expandtabs(tab_size) + colors.reset
-    print(banner)
-    for image in use_images:
-        out_line = str(image.id) + "\t" + ",".join(image.regions) + "\t\t" + image.name
-        out_line = out_line.expandtabs(tab_size)
-        print(out_line)
+    tab_size = 30
+    banner = colors.bold + "ID\tREGIONS\tDESCRIPTION".expandtabs(tab_size) + colors.reset
+    if terse == False:
+        print(banner)
+        for image in use_images:
+            out_line = str(image.id) + "\t" + ",".join(image.regions) + "\t" + image.name
+            out_line = out_line.expandtabs(tab_size)
+            print(out_line)
+    elif terse == True:
+        for image in use_images:
+            out_line = str(image.id) + "," + " ".join(image.regions) + "," + image.name
+            print(out_line)
+    else:
+        exit_with_error(10,"list: templates: terse is neither true nor false. should not happen, debug")
 
 def list_regions(loaded_config,terse=False):
     '''List region codes and descriptions for use in config, pass the config dict'''

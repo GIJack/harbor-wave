@@ -19,8 +19,7 @@ Switches override config
 
   help - brief overview
 
-  list [what] - list things. You may add terse to the argument at the end for
-  CSV list of values instead of a tabbed table
+  list [what] - list things. Use the --terse option for CSV output.
   Subcommands/arguments:
       machines   - Show Virtual Machines in use associated with harbor-wave.
       Based on VM tag in settings.
@@ -49,8 +48,7 @@ Switches override config
 
   get [item] - print value for item, see bellow for list of config items
   
-  print-config   - print all config items in pretty table. if terse is specified
-  return CSV list instead of a tabbed table.
+  print-config   - print all config items in pretty table.
 
   touch          - Stop after proccessing initial config. useful for generating
   blank config file. Will not touch the api-key
@@ -316,11 +314,12 @@ def list_account_balance(loaded_config,terse=False):
     #print
     if terse == False:
         output = "Remaining Funds: $" + str(remaining)
+        message(output)
     elif terse == True:
-        output = "$" + str(remaining)
+        output = str(remaining)
+        print(output)
     else:
         exit_with_error(10,"list: money left: terse neither True nor False, should not be here, debug!")
-    message(output)    
 
 def list_ssh_keys(loaded_config,terse=False):
     '''List SSH keys registered to your digital ocean account'''
@@ -651,6 +650,8 @@ def main():
     parser.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
     parser.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)
     parser.add_argument("-u","--use-dns"             ,help="Use FQDNs for naming VMs and add DNS entries in Networking",action="store_true")
+    
+    parser.add_argument("-T","--terse"               ,help="when using list, print CSV format instead of justified tab tables. Does nothing for other options",action="store_true")
 
     args = parser.parse_args()
 
@@ -703,32 +704,25 @@ def main():
     elif args.command == "print-config":
         print_config(loaded_config)
     elif args.command == "list":
-        terse = False
         if len(args.arguments) < 1:
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
-        if len(args.arguments) >= 2:
-            flags = args.arguments[1:]
-        else:
-            flags = []
-        if "terse" in flags:
-            terse = True
         
         if option == "help":
             message("list:  valid options are machines, templates, regions, vm-sizes, and money-left. see --help for more info")
             sys.exit(4)
         elif option == "machines":
-            list_machines(loaded_config)
+            list_machines(loaded_config,args.terse)
         elif option == "templates":
-            list_templates(loaded_config)
+            list_templates(loaded_config,args.terse)
         elif option == "regions":
-            list_regions(loaded_config)
+            list_regions(loaded_config,args.terse)
         elif option == "ssh-keys":
-            list_ssh_keys(loaded_config)
+            list_ssh_keys(loaded_config,args.terse)
         elif option == "vm-sizes":
-            list_sizes(loaded_config)
+            list_sizes(loaded_config,args.terse)
         elif option == "money-left":
-            list_account_balance(loaded_config)
+            list_account_balance(loaded_config,args.terse)
         else:
             exit_with_error(2,"list: Invalid option, see --help for options")
     elif args.command == "spawn":

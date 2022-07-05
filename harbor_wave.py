@@ -14,7 +14,8 @@ config is stored in ~/.config/harbor-wave/harbor-wave.cfg and is JSON
 API key is stored in ~/.config/harbor-wave/api_key
 
 Switches override config
-
+'''
+command_help='''
 			COMMANDS:
 
   help - brief overview
@@ -52,7 +53,8 @@ Switches override config
 
   touch          - Stop after proccessing initial config. useful for generating
   blank config file. Will not touch the api-key
-
+'''
+config_help='''
         CONFIG ITEMS:
 
    api-key - Digital Ocean API key, used for accessing the account. NOTE this
@@ -85,6 +87,7 @@ Switches override config
    Digital Ocean account.
 
 '''
+full_help_banner=prog_desc+command_help+config_help
 
 import os,sys
 import argparse
@@ -636,7 +639,7 @@ def check_and_load_config(config_dir):
     return loaded_config
 
 def main():
-    parser = argparse.ArgumentParser(description=prog_desc,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(description=full_help_banner,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("command", nargs="?"        ,help="See above for description of commands")
     parser.add_argument("arguments", nargs="*"       ,help="Arguments for command, see above")
     parser.add_argument("-?","--help"                ,help="Show This Help Message", action="help")
@@ -707,10 +710,8 @@ def main():
         if len(args.arguments) < 1:
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
-        
-        if option == "help":
-            message("list:  valid options are machines, templates, regions, vm-sizes, and money-left. see --help for more info")
-            sys.exit(4)
+        elif option == "help":
+            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, vm-sizes, and money left. See  --help for more info"
         elif option == "machines":
             list_machines(loaded_config,args.terse)
         elif option == "templates":

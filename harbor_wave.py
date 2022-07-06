@@ -643,7 +643,7 @@ def main():
     parser.add_argument("command", nargs="?"        ,help="See above for description of commands")
     parser.add_argument("arguments", nargs="*"       ,help="Arguments for command, see above")
     parser.add_argument("-?","--help"                ,help="Show This Help Message", action="help")
-    parser.add_argument("-T","--terse"               ,help="when using list, print CSV format instead of justified tab tables. Does nothing for other options",action="store_true")
+    parser.add_argument("-T","--terse"               ,help="when using list or print-config, print CSV format instead of justified tab tables. Does nothing for other options",action="store_true")
 
     config_overrides = parser.add_argument_group("Config Overrides","Configuration Overrides, lower case")
     config_overrides.add_argument("-a","--api-key"             ,help="Digitial Ocean API key to use",type=str)
@@ -705,7 +705,7 @@ def main():
         item = args.arguments[0]
         get_config(loaded_config,item)
     elif args.command == "print-config":
-        print_config(loaded_config)
+        print_config(loaded_config,args.terse)
     elif args.command == "list":
         if len(args.arguments) < 1:
             exit_with_error(2,"list: list what? needs an argument, see --help")

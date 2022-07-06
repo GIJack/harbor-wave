@@ -11,6 +11,16 @@ Spawn iterative machines on Digital Ocean based on custom templates
 .YS
 
 .SH DESCRIPTION
+Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
+service, to deploy temporary applications using droplets based on custom
+templates. While using multiple machines, it is possible to deploy an
+application as a swarm of droplets, each with a unique sequence number. You can
+do this simply by specifying the amount of droplets with the spawn command.
+
+Communication and interaction between droplets is up to the application in
+the template, but can be facilitated via the private networking between droplets
+that exists by default
+
 Harbor-Wave uses the Digital Ocean API to spawn temporary utility machines based
 on custom templates in Digital Ocean's Cloud. You can rapidly create and destroy
 custom machines. This is designed to go hand-in-hand with Disk-Image-Scripts.

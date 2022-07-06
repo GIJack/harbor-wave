@@ -8,14 +8,21 @@ implemented
 NOTE: REPORT ALL BUGS. ISSUE TRACKER IS ENABLED AND AWAITING YOUR REPORT
 
 Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
-service, to rapidly spin up and destroy droplets based on custom templates.
-Machines are are spawned as a sequence with basename + N, where N is sequence
-number.
+service, to deploy temporary applications using droplets based on custom
+templates. While using multiple machines, it is possible to deploy an
+application as a swarm of droplets, each with a unique sequence number. You can
+do this simply by specifying the amount of droplets with the spawn command.
+
+Communication and interaction between droplets is up to the application in
+the template, but can be facilitated via the private networking between droplets
+that exists by default
 
 Based on a digital Ocean API python lib: https://github.com/koalalorenzo/python-digitalocean
 
-created with custom templates created by disk-image-scripts in mind:
+This is designed as part of an application stack with Disk-Image-Scripts, which
+is to generate custom template images:
 https://github.com/GIJack/disk-image-scripts
+
 
 Steps
 ====

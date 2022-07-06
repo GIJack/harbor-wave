@@ -689,7 +689,7 @@ def main():
     if args.command == None:
         exit_with_error(2,"No command given, see --help")
     elif args.command == "help":
-        message("Syntax is harbor-wave [--options] <command> [arguments]. see --help for more info")
+        parser.print_help()
         sys.exit(0)
     elif args.command == "touch":
         sys.exit(0)
@@ -710,7 +710,7 @@ def main():
         if len(args.arguments) < 1:
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
-        elif option == "help":
+        if option == "help":
             output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, vm-sizes, and money left. See  --help for more info"
         elif option == "machines":
             list_machines(loaded_config,args.terse)

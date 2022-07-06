@@ -353,7 +353,7 @@ def list_ssh_keys(loaded_config,terse=False):
     else:
         exit_with_error(10,"list ssh-keys: terse is neither true nor false, this should not be, debug!")
 
-def create_machine(loaded_config,machine_name,ssh_key):
+def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
     '''Creates a single virtual-machine, uses machine_name variable for name,
     ignores vm-base-name in config. This is a base class that does no checking
     or iteration. must also pass the SSH key, to only have to load it once
@@ -369,6 +369,7 @@ def create_machine(loaded_config,machine_name,ssh_key):
                                     size_slug=loaded_config['vm-size'],
                                     tags=[ loaded_config['tag'] ],
                                     ssh_keys= [ ssh_key ],
+                                    user_data=user_meta,
                                     backups=False )
     new_vm.create()
 
@@ -411,10 +412,11 @@ def spawn_machines(loaded_config,N=1):
     # spawn N machines
     fails = 0
     for i in range(N):
+        user_meta = "Sequence=" + str(i)
         vm_name  = loaded_config['vm-base-name'] + str(i)
-        msg_line = vm_name + "created"
+        msg_line = vm_name + " created"
         try:
-            create_machine(loaded_config,vm_name,use_key)
+            create_machine(loaded_config,vm_name,use_key,user_meta)
             submsg(msg_line)
         except:
             warn("spawn: could not create machine " + vm_name)
@@ -454,7 +456,7 @@ def destroy_machines(loaded_config,args=[]):
                 delete_machines_names.append(item.name)
         
         delete_machines_text = ",".join(delete_machines_names)
-        banner = "Deleting Machine Series: " + basename
+        banner = "Deleting Machine Series: " + base_name
     
     message(banner)
     for item in delete_machines:

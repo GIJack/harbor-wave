@@ -16,6 +16,20 @@ on custom templates in Digital Ocean's Cloud. You can rapidly create and destroy
 custom machines. This is designed to go hand-in-hand with Disk-Image-Scripts.
 https://github.com/GIJack/disk-image-scripts
 
+harbor-wave creates a series of machines with the host name that is generated
+using a basename, and then a number which is the sequence number of the machine.
+
+The amount of machines spawned can be controlled by adding N, a number to the
+end of the spawn command.
+
+in addition, the sequence number is added to the machines meta-data that can
+be retrieved via the API from within the machine in the format:
+
+sequence=N
+
+where N is the sequence number of the machine
+
+DO documentation on droplet metadata: https://docs.digitalocean.com/products/droplets/how-to/retrieve-droplet-metadata/
 
 .SH COMMANDS
 

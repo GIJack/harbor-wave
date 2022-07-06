@@ -643,18 +643,18 @@ def main():
     parser.add_argument("command", nargs="?"        ,help="See above for description of commands")
     parser.add_argument("arguments", nargs="*"       ,help="Arguments for command, see above")
     parser.add_argument("-?","--help"                ,help="Show This Help Message", action="help")
-
-    parser.add_argument("-a","--api-key"             ,help="Digitial Ocean API key to use",type=str)
-    parser.add_argument("-d","--domain"              ,help="Domain to use if --use-dns is used.",type=str)
-    parser.add_argument("-g","--tag"                 ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
-    parser.add_argument("-k","--ssh-key-n"           ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
-    parser.add_argument("-n","--vm-base-name"        ,help="Base Name For New VMs",type=str)
-    parser.add_argument("-r","--region"              ,help="Region code. Specify what datacenter this goes in",type=str)
-    parser.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
-    parser.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)
-    parser.add_argument("-u","--use-dns"             ,help="Use FQDNs for naming VMs and add DNS entries in Networking",action="store_true")
-    
     parser.add_argument("-T","--terse"               ,help="when using list, print CSV format instead of justified tab tables. Does nothing for other options",action="store_true")
+
+    config_overrides = parser.add_argument_group("Config Overrides","Configuration Overrides, lower case")
+    config_overrides.add_argument("-a","--api-key"             ,help="Digitial Ocean API key to use",type=str)
+    config_overrides.add_argument("-d","--domain"              ,help="Domain to use if --use-dns is used.",type=str)
+    config_overrides.add_argument("-g","--tag"                 ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
+    config_overrides.add_argument("-k","--ssh-key-n"           ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
+    config_overrides.add_argument("-n","--vm-base-name"        ,help="Base Name For New VMs",type=str)
+    config_overrides.add_argument("-r","--region"              ,help="Region code. Specify what datacenter this goes in",type=str)
+    config_overrides.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
+    config_overrides.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)
+    config_overrides.add_argument("-u","--use-dns"             ,help="Use FQDNs for naming VMs and add DNS entries in Networking",action="store_true")
 
     args = parser.parse_args()
 

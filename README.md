@@ -8,9 +8,10 @@ NOTE: REPORT ALL BUGS. ISSUE TRACKER IS ENABLED AND AWAITING YOUR REPORT
 
 Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
 service, to rapidly spin up and destroy droplets based on custom templates.
-Based on a digital Ocean API python lib:
+Machines are are spawned as a sequence with basename + N, where N is sequence
+number.
 
-https://github.com/koalalorenzo/python-digitalocean
+Based on a digital Ocean API python lib: https://github.com/koalalorenzo/python-digitalocean
 
 created with custom templates created by disk-image-scripts in mind:
 https://github.com/GIJack/disk-image-scripts
@@ -71,7 +72,10 @@ you are ready to start spawning VMs with
 ```
 harbor-wave spawn <N>
 ```
-N is optional. Its a count of machines to spin up
+N is optional. Its a count of machines to spin up. Each will be named with
+basename + sequence number. In addition, you can get this sequence number
+via the user_data metadata option from digital ocean's cloud:
+https://docs.digitalocean.com/products/droplets/how-to/provide-user-data/
 
 or delete with
 

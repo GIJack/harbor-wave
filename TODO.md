@@ -16,4 +16,6 @@ Brainstorming
 * Add support for Digital Ocean Projects, putting new VMs in specify project.
 initially part of the design, but removed as there was no immediate way of doing
 this
-
+* More intellegent spawn/destroy logic, more complex rules.
+* perhaps more cloud-init custom data? Perhaps someway to feed applications at
+spawn time, such as a parameter or switch?"

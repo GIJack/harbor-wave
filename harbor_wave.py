@@ -24,6 +24,8 @@ command_help='''
   Subcommands/arguments:
       machines   - Show Virtual Machines in use associated with harbor-wave.
       Based on VM tag in settings.
+      
+      projects   - List Projects on current account
 
       templates  - Show available custom images.
   
@@ -96,6 +98,7 @@ import digitalocean
 
 default_config = {
     "domain"       : "",
+    "project"      : None,
     "region"       : "nyc1",
     "ssh-key-n"    : 0,
     "tag"          : "harborwave",
@@ -653,6 +656,7 @@ def main():
     config_overrides.add_argument("-g","--tag"                 ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
     config_overrides.add_argument("-k","--ssh-key-n"           ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
     config_overrides.add_argument("-n","--vm-base-name"        ,help="Base Name For New VMs",type=str)
+    config_overrides.add_argument("-p","--project"             ,help="Digital Ocean Project to put new virtual machines in",type=str)
     config_overrides.add_argument("-r","--region"              ,help="Region code. Specify what datacenter this goes in",type=str)
     config_overrides.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
     config_overrides.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)
@@ -672,6 +676,8 @@ def main():
         loaded_config['api-key']       = args.api_key
     if args.domain != None:
         loaded_config['domain']        = args.domain
+    if args.project != None:
+        loaded_config['project']       = args.project
     if args.tag != None:
         loaded_config['tag']           = args.tag
     if args.region != None:

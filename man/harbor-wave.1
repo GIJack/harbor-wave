@@ -83,6 +83,9 @@ Stop after processing config. Useful for generating a new config with defaults
 .BR machines
 \t List VMs associated with harborwave. Based on tag setting.  Default: harborwave
 
+.BR projects
+\t List Projects associated with the current account
+
 .BR templates
 \t Show available custom images
 
@@ -155,7 +158,10 @@ list and print-config commands uses CSV format for output. Does nothing for all 
 \t Doman to use if use-dns is true
 
 .BR "-g, --tag" \fR \t TAG
-\t DO tag to use on VMs so harbor-wave can identify its VMs.
+\t Digital Ocean tag to use on VMs so harbor-wave can identify its VMs.
+
+.BR "-p, --project" \fR \t PROJECT
+\t Digital Ocean Project for new machines
 
 .BR "-k, --ssh-key-n" \fR \t SSH_KEY_N
 \t Interger: index of the SSH-key to use on the created hosts. Default: 0

@@ -3,7 +3,7 @@ harbor-wave
 
 STATUS: early-alpha. All commands now implemented, man page is rough draft,
 still need bash completion, not really tested. DNS intergration is not
-implemented
+implemented. Projects not implemented
 
 NOTE: REPORT ALL BUGS. ISSUE TRACKER IS ENABLED AND AWAITING YOUR REPORT
 

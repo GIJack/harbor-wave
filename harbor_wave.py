@@ -25,7 +25,7 @@ command_help='''
       machines   - Show Virtual Machines in use associated with harbor-wave.
       Based on VM tag in settings.
       
-      projects   - List Projects on current account
+      projects   - List projects on current account
 
       templates  - Show available custom images.
   
@@ -64,6 +64,9 @@ config_help='''
    api-key file
 
    domain      - DNS domain to use if use-dns is set True
+   
+   project     - name of project in account where new machines spawn. If blank
+   default is used
 
    region      - digital ocean region code slug to spawn droplets. You can get a
    list of valid entries with the list-reigons command. Default: nyc1
@@ -656,7 +659,7 @@ def main():
     config_overrides.add_argument("-g","--tag"                 ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
     config_overrides.add_argument("-k","--ssh-key-n"           ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
     config_overrides.add_argument("-n","--vm-base-name"        ,help="Base Name For New VMs",type=str)
-    config_overrides.add_argument("-p","--project"             ,help="Digital Ocean Project to put new virtual machines in",type=str)
+    config_overrides.add_argument("-p","--project"             ,help="name of project in account where new machines spawn. If blank default is used",type=str)
     config_overrides.add_argument("-r","--region"              ,help="Region code. Specify what datacenter this goes in",type=str)
     config_overrides.add_argument("-s","--vm-size"             ,help="Size code for new VMs",type=str)
     config_overrides.add_argument("-t","--vm-template"         ,help="Image Template for spawning new VMs",type=str)

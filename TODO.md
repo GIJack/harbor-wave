@@ -8,11 +8,17 @@ Needed
 * DNS - implement --use-dns to make machines with FQDN. Big stopper is that IP
 address is not returned from machine creation. It is generally several seconds
 perhaps 1 minuete until IP address is known to the UI. Need new way of doing this
+* Projects - implement project code. Add new droplets/machines to account project
+this will help declutter and management esepcially if you have other machines
+that aren't harbor-wave applications. It would be a decent idea to just put them
+in a harbor-wave specific project. Unlike previous design idea, this will NOT
+limit delete or list, as these will be based on tags.
 * Push image template - need way to push template that is local to Digital Ocean. This
 means we need access to a spaces(S3-type bucket), and this is not in the python
 module. this might be added to disk-image-scripts, being that if called from
 a disk-image-scripts template, we could use metadata to create template images
 on digital ocean. This information is lost once processed into an image.
+* Setup packaging
 
 Brainstorming
 -----

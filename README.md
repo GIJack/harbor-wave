@@ -73,7 +73,10 @@ harbor-wave set vm-base-name <base_name_for_vm>
 harbor-wave set ssh-key-n <N> #index of SSH key
 ```
 
-SSH key index, is a count-from-0 index
+SSH key index, is a count-from-0 index, you can see available keys with
+```
+harbor-wave list ssh-keys
+```
 
 you are ready to start spawning VMs with
 
@@ -81,17 +84,22 @@ you are ready to start spawning VMs with
 harbor-wave spawn <N>
 ```
 N is optional. Its a count of machines to spin up. Each will be named with
-basename + sequence number. In addition, you can get this sequence number
-via the user_data metadata option from digital ocean's cloud:
+basename + sequence number.
+
+You can get this sequence number from inside the machine with the user_data
+metadata option from digital ocean's cloud:
+
 https://docs.digitalocean.com/products/droplets/how-to/provide-user-data/
 
-or delete with
+to spin down the environment use the destroy command. this will destroy all
+machines with vm-basename. you can specify ALL, to destroy all machines with
+the harborwave tag
 
 ```
-harbor-wave destroy [vm-name]
+harbor-wave destroy <"ALL">
 ```
 
-List machines associated with harborwave, by tag(set tag)
+List machines associated with harborwave(based on tag)
 ```
 harbor-wave list machines
 ```
@@ -105,7 +113,8 @@ harbor-wave list ssh-keys
 You may add terse at the end of a list command for a CSV list instead of tabbed
 tables
 
-Show you Digital Ocean account balance. NOTE, you cannot add funds via the API.
+Show you Digital Ocean account balance. NOTE, you cannot add funds with this
+tool
 ```
 harbor-wave list money-left
 ```

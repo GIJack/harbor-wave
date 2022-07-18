@@ -305,6 +305,34 @@ def list_sizes(loaded_config,terse=False):
     else:
         exit_with_error(10,"list: sizes - terse neither true nor false, should not be here, debug!")
 
+def list_projects(loaded_config,terse=False):
+    '''List all Projects in your Digital Ocean Account'''
+    
+    manager = check_and_connect(loaded_config)
+    
+    try:
+        projects = manager.get_all_projects()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list: DataReadError, check settings and try again")
+    
+    tab_spaces = 10
+    header = colors.bold + "ID\tNAME".expandtabs(tab_spaces) + colors.reset
+    num_projects = len(projects)
+    if terse == False:
+        print(header)
+        for index in range(num_projects):
+            item = projects[index]
+            out_line = str(index) + "\t" + item.name
+            out_line = out_line.expandtabs(tab_spaces)
+            print(out_line)
+    elif terse == True:
+        for item in projects:
+            item = projects[index]
+            out_line = str(index) + "," + item.name
+            print(out_line)
+    else:
+        exit_with_error(10,"list: projects - terse neither true nor false, should not be here, debug")
+
 def list_account_balance(loaded_config,terse=False):
     '''Shows how much money you have left in the account'''
         
@@ -725,6 +753,8 @@ def main():
             output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, vm-sizes, and money left. See  --help for more info"
         elif option == "machines":
             list_machines(loaded_config,args.terse)
+        elif option == "projects":
+            list_projects(loaded_config,args.terse)
         elif option == "templates":
             list_templates(loaded_config,args.terse)
         elif option == "regions":

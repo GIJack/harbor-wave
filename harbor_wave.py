@@ -356,7 +356,7 @@ def list_account_balance(loaded_config,terse=False):
         output = str(remaining)
         print(output)
     else:
-        exit_with_error(10,"list: money left: terse neither True nor False, should not be here, debug!")
+        exit_with_error(10,"list: money-left: terse neither True nor False, should not be here, debug!")
 
 def list_ssh_keys(loaded_config,terse=False):
     '''List SSH keys registered to your digital ocean account'''
@@ -780,7 +780,7 @@ def main():
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
         if option == "help":
-            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, vm-sizes, and money left. See  --help for more info"
+            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, vm-sizes, and money-left. See  --help for more info"
             print(output_line)
         elif option == "machines":
             list_machines(loaded_config,args.terse)

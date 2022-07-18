@@ -18,7 +18,10 @@ Switches override config
 command_help='''
 			COMMANDS:
 
-  help - brief overview
+  help <topic> - brief overview. if topic is specified then only the relevant
+  entries for that topic are printed.
+  
+  help topics: config, commands
 
   list [what] - list things. Use the --terse option for CSV output.
   Subcommands/arguments:
@@ -747,8 +750,19 @@ def main():
     if args.command == None:
         exit_with_error(2,"No command given, see --help")
     elif args.command == "help":
-        parser.print_help()
-        sys.exit(0)
+        if len(args.arguments) >= 1:
+            subject = args.arguments[0]
+        else:
+            parser.print_help()
+            sys.exit(4)
+        if subject == "commands":
+            print(command_help)
+            sys.exit(4)
+        elif subject == "config":
+            print(config_help)
+            sys.exit(4)
+        else:
+            exit_with_error(2,"help: no such topic. see --help or help for topics")
     elif args.command == "touch":
         sys.exit(0)
     elif args.command == "set":
@@ -770,6 +784,7 @@ def main():
         option = args.arguments[0]
         if option == "help":
             output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, vm-sizes, and money left. See  --help for more info"
+            print(output_line)
         elif option == "machines":
             list_machines(loaded_config,args.terse)
         elif option == "projects":

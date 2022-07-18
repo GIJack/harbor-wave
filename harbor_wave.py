@@ -318,20 +318,17 @@ def list_projects(loaded_config,terse=False):
     except digitalocean.DataReadError:
         exit_with_error(1,"list: DataReadError, check settings and try again")
     
-    tab_spaces = 10
-    header = colors.bold + "ID\tNAME".expandtabs(tab_spaces) + colors.reset
-    num_projects = len(projects)
+    tab_spaces = 25
+    header = colors.bold + "NAME\tTIER\tDESCRIPTION".expandtabs(tab_spaces) + colors.reset
     if terse == False:
         print(header)
-        for index in range(num_projects):
-            item = projects[index]
-            out_line = str(index) + "\t" + item.name
+        for item in projects:
+            out_line = item.name + "\t" + item.environment + "\t" + item.description
             out_line = out_line.expandtabs(tab_spaces)
             print(out_line)
     elif terse == True:
         for item in projects:
-            item = projects[index]
-            out_line = str(index) + "," + item.name
+            out_line = item.name + "," + item.environment + "," + item.description
             print(out_line)
     else:
         exit_with_error(10,"list: projects - terse neither true nor false, should not be here, debug")

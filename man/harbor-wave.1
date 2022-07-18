@@ -43,8 +43,11 @@ DO documentation on droplet metadata: https://docs.digitalocean.com/products/dro
 
 .SH COMMANDS
 
-.BR help
-\tShort Help blurb
+.BR help \t \fr\fI<topic>\fR
+\tShort Help blurb. If topic is specified then only that topic is displayed.
+help by itself will print the full help.
+
+topics: config, commands
 
 .BR list \t \fR\fI[what]\fR
 \tList information from Digital Ocean. Takes a subcommand. See subsection \fB LIST SUBCOMMANDS\fR below

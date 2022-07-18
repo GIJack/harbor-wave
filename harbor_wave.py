@@ -101,7 +101,7 @@ import digitalocean
 
 default_config = {
     "domain"       : "",
-    "project"      : None,
+    "project"      : "",
     "region"       : "nyc1",
     "ssh-key-n"    : 0,
     "tag"          : "harborwave",
@@ -414,7 +414,7 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
             if item.name == loaded_config['project']:
                 use_project = item
         if use_project == None:
-            warn("spawn: could not add " + machine_name + " to non-existant project, skipping")
+            warn("spawn: could not add " + machine_name + " to non-existant project: " + loaded_config['project'] + ", skipping")
             return
         droplet_add_string = "do:droplet:" + str(new_vm.id)
         use_project.assign_resource([droplet_add_string])
@@ -494,7 +494,7 @@ def destroy_machines(loaded_config,args=[]):
     delete_machines_names = []
     if "ALL" in args:
         delete_machines = running_machine_list
-        banner = "Deleting ALL Machines"
+        banner = "Destroying ALL Machines"
     else:
         for item in running_machine_list:
             if item.name.startswith(base_name):
@@ -502,8 +502,9 @@ def destroy_machines(loaded_config,args=[]):
                 delete_machines_names.append(item.name)
         
         delete_machines_text = ",".join(delete_machines_names)
-        banner = "Deleting Machine Series: " + base_name
+        banner = "Destroying machine Series: " + base_name
     
+    fails = 0
     message(banner)
     for item in delete_machines:
         try:
@@ -511,6 +512,11 @@ def destroy_machines(loaded_config,args=[]):
             submsg(item.name + " destroyed")
         except:
             warn("Could not destroy" + item.name)
+            fails+=1
+    if fails >= 1:
+        message("Done, but with " + fails + " failures")
+    else:
+        message("Done")
 
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
@@ -527,8 +533,9 @@ def set_config(config_dir,loaded_config,item,value):
     # Null value check
     if item == None or item == "":
         exit_with_error(2, "set: item name can't be blank")
+    # Null set now resets to default
     elif value == None or value == "":
-        exit_with_error(2, "set: item value can't be blank")
+        value = default_config[item]
     elif item not in all_set_items:
         exit_with_error(2, "set: " + item + " is not a valid config item" )
     # Check and set type

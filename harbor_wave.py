@@ -406,6 +406,18 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
                                     user_data=user_meta,
                                     backups=False )
     new_vm.create()
+    
+    if loaded_config['project'] != None and loaded_config['project'] != "":
+        use_project = None
+        projects = manager.get_all_projects()
+        for item in projects:
+            if item.name == loaded_config['project']:
+                use_project = item
+        if use_project == None:
+            warn("spawn: could not add " + machine_name + " to non-existant project, skipping")
+            return
+        droplet_add_string = "do:droplet:" + str(new_vm.id)
+        use_project.assign_resource([droplet_add_string])
 
 def create_dns(loaded_config,vm_name,ip_address):
     '''Update DNS for new virtual machine, assumes domain is valid, check first'''

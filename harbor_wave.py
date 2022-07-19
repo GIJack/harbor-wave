@@ -713,7 +713,7 @@ def main():
     config_overrides.add_argument("-r","--region"           ,help="Region code. Specify what datacenter this goes in",type=str)
     config_overrides.add_argument("-s","--vm-size"          ,help="Size code for new VMs",type=str)
     config_overrides.add_argument("-t","--vm-template"      ,help="Image Template for spawning new VMs",type=str)
-    config_overrides.add_argument("-u","--use-dns"          ,help="Use FQDNs for naming VMs and add DNS entries in Networking",action="store_true")
+    config_overrides.add_argument("-u","--use-dns"          ,help="Use FQDNs for naming VMs and add DNS entries in Networking. NOT IMPLEMENNTED YET",action="store_true")
 
     args = parser.parse_args()
 

@@ -13,8 +13,7 @@ means we need access to a spaces(S3-type bucket), and this is not in the python
 module. this might be added to disk-image-scripts, being that if called from
 a disk-image-scripts template, we could use metadata to create template images
 on digital ocean. This information is lost once processed into an image.
-* Setup packaging
-* write bash-completion
+* Setup python packaging?
 
 Brainstorming
 -----

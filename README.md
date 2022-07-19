@@ -1,9 +1,10 @@
 harbor-wave
 =============
 
-STATUS: early-alpha. All commands now implemented, man page is rough draft,
-still need bash completion, not really tested. DNS intergration is not
-implemented.
+STATUS: early-alpha. All commands now implemented. --use-dns switch is not
+implemented yet, everything else should work.
+
+See TODO.md for more info.
 
 NOTE: REPORT ALL BUGS. ISSUE TRACKER IS ENABLED AND AWAITING YOUR REPORT
 

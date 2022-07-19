@@ -608,8 +608,10 @@ def print_config(loaded_config,terse=False):
     
 def get_config(loaded_config,item):
     '''prints working config item, takes two options, dict with config items, and item you need'''
-    if item == "api-key":
-        exit_with_error(2,"get: Won't print api key... ")
+    # sensative items we will avoid printing.
+    restricted_list = ['api_key']
+    if item in restricted_list:
+        exit_with_error(2,"get: Won't print " + item + "... ")
     if item not in loaded_config.keys():
         exit_with_error(2,"get: No such config item: " + item)
     

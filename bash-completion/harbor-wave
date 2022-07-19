@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+_harborwave_completion(){
+  local curv prev
+  local base_commands="spawn destroy list get set help print-config touch"
+  local help_topics="config commands"
+  local list_commands="machines templates regions ssh-keys vm-sizes money-left"
+  local config_items="api_key domain region ssh-key-n tag vm-base-name vm-size vm-template use-dns"
+  cur=${COMP_WORDS[COMP_CWORD]}
+  prev=${COMP_WORDS[COMP_CWORD-1]}
+
+  case ${COMP_CWORD} in
+    1)
+      COMPREPLY=($(compgen -W "${base_commands}" -- ${cur}))
+      ;;
+    2)
+      case ${prev} in
+        get|set)
+          COMPREPLY=($(compgen -W "${config_items}" -- ${cur}))
+          ;;
+        help)
+          COMPREPLY=($(compgen -W "${help_topics}" -- ${cur}))
+          ;;
+        list)
+          COMPREPLY=($(compgen -W "${list_commands}" -- ${cur}))
+          ;;
+        *)
+          COMPREPLY=()
+          ;;
+      esac
+      ;;
+    *)
+      COMPREPLY=()
+      ;;
+  esac
+}
+
+complete -F _harborwave_completion harbor-wave

@@ -50,7 +50,8 @@ command_help='''
   destroy <"ALL">- Destroy VMs. If ALL is appended, then all harbor-wave VMs
   will be destroyed, based on tag.
   
-  set [item] [value] - set a config item. See bellow for list of config items
+  set [item] [value] - set a config item. See bellow for list of config items.
+  Setting a value of "" will reset this item to its default value
 
   get [item] - print value for item, see bellow for list of config items
   

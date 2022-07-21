@@ -454,7 +454,7 @@ def spawn_machines(loaded_config,N=1):
         if check_dns(loaded_config['domain']) == False:
             exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
 
-    banner = "spawning " + str(N) + " VM(s)"
+    banner = "Spawning machine series: " + loaded_config['vm-base-name'] + ", " + str(N) + " Machines(s)"
     message(banner)
     # spawn N machines
     fails = 0
@@ -495,15 +495,16 @@ def destroy_machines(loaded_config,args=[]):
     delete_machines_names = []
     if "ALL" in args:
         delete_machines = running_machine_list
-        banner = "Destroying ALL Machines"
+        N = len(delete_machines)
+        banner = "Destroying ALL Machines. Count: " + str(N) + " machine(s)"
     else:
         for item in running_machine_list:
             if item.name.startswith(base_name):
                 delete_machines.append(item)
                 delete_machines_names.append(item.name)
-        
+        N = len(delete_machines)
         delete_machines_text = ",".join(delete_machines_names)
-        banner = "Destroying machine Series: " + base_name
+        banner = "Destroying machine Series: " + base_name + ", " + str(N) + " machine(s)"
     
     fails = 0
     message(banner)

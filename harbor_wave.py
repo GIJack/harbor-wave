@@ -39,9 +39,10 @@ command_help='''
   
       vm-sizes   - List of valid vm size codes for use in config
       
-      money-left - How much $$$ you have left on your DO account. So far,
-      you need to log in to the Web interface to add more $$$. Haven't worked
-      out replenish by API yet...
+      money-left - How much $$$ you have left on your DO account. also shows
+      "Burn Rate", the rate of which harbor-wave machines cost money. burn-rate
+      is in dollars per hour, and only shows money used by harbor-wave machines,
+      not the entirity for the account.
       
     example: harbor-wave list vm-sizes
 
@@ -343,18 +344,38 @@ def list_account_balance(loaded_config,terse=False):
         funds = manager.get_balance()
     except digitalocean.DataReadError:
         exit_with_error(1,"list: DataReadError, check settings and try again")    
+
+    droplet_tag = loaded_config['tag']
+    try:
+        droplet_list = manager.get_all_droplets(tag_name=droplet_tag)
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list: DataReadError, check settings and try again")
    
     # some back-of-the-napkin math
     used_so_far = float(funds.month_to_date_usage)
     balance     = abs(float(funds.account_balance))
     remaining   = round(balance - used_so_far,2)
     
+    # get total burn rate from harbor-wave VMs
+    burn_rate = float(0)
+
+    for item in droplet_list:
+        burn_rate += item.size['price_hourly']
+    
     #print
+    banner = "Finances"
+    tab_space = 18
     if terse == False:
-        output = "Remaining Funds: $" + str(remaining)
-        message(output)
+        message(banner)
+        output = colors.bold + "Remaining Funds: \t" + colors.reset + "$" + str(remaining)
+        output = output.expandtabs(tab_space)
+        print(output)
+        output = colors.bold + "Burn Rate($/Hour): \t" + colors.reset + "$" + str(burn_rate)
+        output = output.expandtabs(tab_space)
+        print(output)
+        
     elif terse == True:
-        output = str(remaining)
+        output = str(remaining) + "," + str(burn_rate)
         print(output)
     else:
         exit_with_error(10,"list: money-left: terse neither True nor False, should not be here, debug!")

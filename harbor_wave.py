@@ -460,8 +460,8 @@ def spawn_machines(loaded_config,N=1):
     fails = 0
     for i in range(N):
         user_meta = "Sequence=" + str(i)
-        vm_name  = loaded_config['vm-base-name'] + str(i)
-        msg_line = vm_name + " created"
+        vm_name   = loaded_config['vm-base-name'] + str(i)
+        msg_line  = vm_name + " created"
         try:
             create_machine(loaded_config,vm_name,use_key,user_meta)
             submsg(msg_line)

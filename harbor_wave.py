@@ -475,7 +475,7 @@ def spawn_machines(loaded_config,N=1):
         if check_dns(loaded_config['domain']) == False:
             exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
 
-    banner = "Spawning machine series: " + loaded_config['vm-base-name'] + ", " + str(N) + " Machines(s)"
+    banner = "Spawning machine series: " + loaded_config['vm-base-name'] + ", " + str(N) + " machines(s)"
     message(banner)
     # spawn N machines
     fails = 0

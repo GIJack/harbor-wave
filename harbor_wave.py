@@ -658,8 +658,8 @@ def check_and_load_config(config_dir):
     config_file_name = "harbor-wave.cfg"
     api_file_name    = "api-key"
     
-    # These will be loaded with actual values later. Value None means load
-    # load failed
+    # These will be loaded with actual values later. Value None means load 
+    # failed
     loaded_config    = None
     loaded_api_key   = None
     

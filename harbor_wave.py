@@ -513,7 +513,6 @@ def destroy_machines(loaded_config,args=[]):
     
     # Sort out what needs to be deleted
     delete_machines       = []
-    delete_machines_names = []
     if "ALL" in args:
         delete_machines = running_machine_list
         N = len(delete_machines)

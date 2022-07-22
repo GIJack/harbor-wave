@@ -525,7 +525,7 @@ def destroy_machines(loaded_config,args=[]):
                 delete_machines_names.append(item.name)
         N = len(delete_machines)
         delete_machines_text = ",".join(delete_machines_names)
-        banner = "Destroying machine Series: " + base_name + ", " + str(N) + " machine(s)"
+        banner = "Destroying machine series: " + base_name + ", " + str(N) + " machine(s)"
     
     fails = 0
     message(banner)

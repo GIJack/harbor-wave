@@ -205,7 +205,7 @@ def list_machines(loaded_config,terse=False):
     try:
         droplet_list = manager.get_all_droplets(tag_name=droplet_tag)
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")
+        exit_with_error(2,"list: DataReadError, check settings and try again")
     
     tab_spacing = 20
     header  = colors.bold + "NAME\tIP ADDRESS\tREGION\tSIZE\tTEMPLATE\t\tDATESTAMP".expandtabs(tab_spacing) + colors.reset
@@ -230,7 +230,7 @@ def list_templates(loaded_config,terse=False):
     try:
         all_images = manager.get_my_images()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")
+        exit_with_error(2,"list: DataReadError, check settings and try again")
     
     # Seperate out user uploaded images
     use_images = []
@@ -262,7 +262,7 @@ def list_regions(loaded_config,terse=False):
     try:
         regions = manager.get_all_regions()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")
+        exit_with_error(2,"list: DataReadError, check settings and try again")
 
     #print
     tab_space = 13
@@ -288,7 +288,7 @@ def list_sizes(loaded_config,terse=False):
     try:
         avail_sizes = manager.get_all_sizes()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")
+        exit_with_error(2,"list: DataReadError, check settings and try again")
     
     # print
     tab_space = 19
@@ -318,7 +318,7 @@ def list_projects(loaded_config,terse=False):
     try:
         projects = manager.get_all_projects()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")
+        exit_with_error(2,"list: DataReadError, check settings and try again")
     
     tab_spaces = 25
     header = colors.bold + "NAME\tTIER\tDESCRIPTION".expandtabs(tab_spaces) + colors.reset
@@ -343,13 +343,13 @@ def list_account_balance(loaded_config,terse=False):
     try:
         funds = manager.get_balance()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")    
+        exit_with_error(2,"list: DataReadError, check settings and try again")    
 
     droplet_tag = loaded_config['tag']
     try:
         droplet_list = manager.get_all_droplets(tag_name=droplet_tag)
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")
+        exit_with_error(2,"list: DataReadError, check settings and try again")
    
     # some back-of-the-napkin math
     used_so_far = float(funds.month_to_date_usage)
@@ -388,7 +388,7 @@ def list_ssh_keys(loaded_config,terse=False):
     try:
         ssh_keys = manager.get_all_sshkeys()
     except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")  
+        exit_with_error(2,"list: DataReadError, check settings and try again")  
     
     # Now print
     tab_size =  18
@@ -492,6 +492,7 @@ def spawn_machines(loaded_config,N=1):
     
     if fails >= 1:
         message("Done, but with " + str(fails) + " failures" )
+        sys.exit(1)
     else:
         message("Done")
     
@@ -535,6 +536,7 @@ def destroy_machines(loaded_config,args=[]):
             fails+=1
     if fails >= 1:
         message("Done, but with " + fails + " failures")
+        sys.exit(1)
     else:
         message("Done")
 

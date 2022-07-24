@@ -33,9 +33,14 @@ The amount of machines spawned can be controlled by adding N, a number to the
 end of the spawn command.
 
 in addition, the sequence number is added to the machines meta-data that can
-be retrieved via the API from within the machine in the format:
+be retrieved via the API from within the machine in JSON format, that has
+"sequence":N and "base-name":string, and "payload":string, keys.
 
-sequence=N
+{
+    "sequence":N
+    "base-name":"name"
+    "payload":<...>
+}
 
 where N is the sequence number of the machine
 
@@ -116,6 +121,16 @@ via tag
 .BR domain
 \t DNS domain to use if use-dns is set True. This
 domain needs to be already setup in Digital Ocean Networking for this to work.
+
+.BR project
+\t Digital Ocean uses "projects" as subfolders for objects. if this is not ""
+new machines will spawn in the configured project for easy manager. Project must
+exist. default is unset
+
+.BR payload
+\t Payload is arbitrary data that is sent to the machine, that can be used for
+as input data. This will be made available as a payload key in the JSON array
+in the user-data using Digital Ocean's API
 
 .BR region
 \t Digital Ocean region code. Droplets will spawn in this DO region, but list

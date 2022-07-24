@@ -70,6 +70,10 @@ config_help='''
 
    domain      - DNS domain to use if use-dns is set True
    
+   payload     - user content that gets posted to digital ocean user-data API.
+   if starts with keyword FILE:, then file specified is uploaded instead of
+   string.
+   
    project     - name of project in account where new machines spawn. If blank
    default is used
 
@@ -106,6 +110,7 @@ import digitalocean
 
 default_config = {
     "domain"       : "",
+    "payload"      : "",
     "project"      : "",
     "region"       : "nyc1",
     "ssh-key-n"    : 0,
@@ -475,12 +480,28 @@ def spawn_machines(loaded_config,N=1):
         if check_dns(loaded_config['domain']) == False:
             exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
 
+    # Load payload from file, if applicable
+    meta_payload = None
+    if loaded_config['payload'].startswith("FILE:") == True:
+        # get filename as everythinng after first ':'
+        meta_filename = loaded_config['payload'].split(":")[1:]
+        meta_filename = " ".join(meta_filename)
+        try:
+            file_obj = open(meta_filename,"r")
+            file_data = file_obj.read()
+            file_obj.close()
+            meta_payload = file_data
+        except:
+            exit_with_error(2,"spawn: could not read payload from " + meta_filename + ". Please ensure this file exists and read permissions are set")
+    else:
+        meta_payload = loaded_config['payload']
+    
     banner = "Spawning machine series: " + loaded_config['vm-base-name'] + ", " + str(N) + " machines(s)"
     message(banner)
     # spawn N machines
     fails = 0
     for i in range(N):
-        user_meta = { "sequence" : int(i), "base-name":loaded_config['vm-base-name'] }
+        user_meta = { "sequence" : int(i), "base-name":loaded_config['vm-base-name'], "payload":meta_payload }
         user_meta = json.dumps(user_meta,indent=4)
         vm_name   = loaded_config['vm-base-name'] + str(i)
         msg_line  = vm_name + " created"
@@ -547,7 +568,7 @@ def set_config(config_dir,loaded_config,item,value):
     config_file_name = "harbor-wave.cfg"
     api_file         = config_dir + "/" + api_file_name
     config_file      = config_dir + "/" + config_file_name
-    set_item_str     = ["api-key","domain", "vm-base-name","project","vm-size","region","vm-template", "tag"]
+    set_item_str     = ["api-key","domain", "vm-base-name","payload","project","vm-size","region","vm-template", "tag"]
     set_item_int     = ["ssh-key-n"]
     set_item_bool    = ["use-dns"]
     all_set_items    = set_item_str + set_item_int + set_item_bool
@@ -730,6 +751,7 @@ def main():
     config_overrides.add_argument("-d","--domain"           ,help="Domain to use if --use-dns is used.",type=str)
     config_overrides.add_argument("-g","--tag"              ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
     config_overrides.add_argument("-k","--ssh-key-n"        ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
+    config_overrides.add_argument("-l","--payload"          ,help="Aribtrary content that gets sent to every spawned machine via user-data in API. if FILE: is specified, local file is read and used as a payload as a string",type=str)
     config_overrides.add_argument("-n","--vm-base-name"     ,help="Base Name For New VMs",type=str)
     config_overrides.add_argument("-p","--project"          ,help="name of project in account where new machines spawn. If blank default is used",type=str)
     config_overrides.add_argument("-r","--region"           ,help="Region code. Specify what datacenter this goes in",type=str)
@@ -751,6 +773,8 @@ def main():
         loaded_config['api-key']       = args.api_key
     if args.domain != None:
         loaded_config['domain']        = args.domain
+    if args.payload != None:
+        loaded_config['payload']       = args.payload
     if args.project != None:
         loaded_config['project']       = args.project
     if args.tag != None:

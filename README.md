@@ -84,15 +84,9 @@ you are ready to start spawning VMs with
 ```
 harbor-wave spawn <N>
 ```
-N is optional. Its a count of machines to spin up. Each will be named with
-basename + sequence number.
+N is optional. Its a count of machines to spin up.
 
-You can get this sequence number from inside the machine with the user_data
-metadata option from digital ocean's cloud:
-
-https://docs.digitalocean.com/products/droplets/how-to/provide-user-data/
-
-to spin down the environment use the destroy command. this will destroy all
+To spin down the environment use the destroy command. this will destroy all
 machines with vm-basename. you can specify ALL, to destroy all machines with
 the harborwave tag
 
@@ -125,3 +119,16 @@ For more info see either
 man 1 harbor-wave
 harbor-wave --help
 ```
+
+User-data
+---------
+Machines spun up with harbor wave have a JSON array in DO's user data for
+cloud-init.
+https://docs.digitalocean.com/products/droplets/how-to/provide-user-data/
+
+there are three keys:
+
+sequence: Interger, sequence number of the machine spawned
+base-name: base name of the hostname
+payload: arbitrary string from config or command line, that allows input data
+to be given to the machines at spawn time

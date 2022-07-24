@@ -128,9 +128,9 @@ new machines will spawn in the configured project for easy manager. Project must
 exist. default is unset
 
 .BR payload
-\t Payload is arbitrary data that is sent to the machine, that can be used for
-as input data. This will be made available as a payload key in the JSON array
-in the user-data using Digital Ocean's API
+\t Input data from your local machine and made availble over the
+Digital Ocean API, for use with cloud-init or other. This is a string unless it
+starts with FILE:. In this case, file contents are uploaded
 
 .BR region
 \t Digital Ocean region code. Droplets will spawn in this DO region, but list

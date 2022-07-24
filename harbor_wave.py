@@ -70,9 +70,9 @@ config_help='''
 
    domain      - DNS domain to use if use-dns is set True
    
-   payload     - user content that gets posted to digital ocean user-data API.
-   if starts with keyword FILE:, then file specified is uploaded instead of
-   string.
+   payload     - Input data from your local machine and made availble over the
+   Digital Ocean API, for use with cloud-init or other. This is a string
+   unless it starts with FILE:. In this case, file contents are uploaded
    
    project     - name of project in account where new machines spawn. If blank
    default is used

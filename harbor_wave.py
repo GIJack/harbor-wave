@@ -232,7 +232,7 @@ def list_machines(loaded_config,terse=False):
         exit_with_error(2,"list: DataReadError, check settings and try again")
     
     tab_spacing = 20
-    header  = colors.bold + "NAME\tIP ADDRESS\tREGION\tSIZE\tTEMPLATE\t\tTIME RUNNING(H:M:S.uS)".expandtabs(tab_spacing) + colors.reset
+    header  = colors.bold + "NAME\tIP ADDRESS\tREGION\tSIZE\tTEMPLATE\t\tTIME RUNNING(H:M:S.µS)".expandtabs(tab_spacing) + colors.reset
     out_line = ""
     if terse == False:
         print(header)

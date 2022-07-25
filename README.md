@@ -4,6 +4,9 @@ harbor-wave
 STATUS: early-alpha. All commands now implemented. --use-dns switch is not
 implemented yet, everything else should work.
 
+As of such, API, and switches/subcommands are NOT stable yet. Please check them
+after every pull
+
 See TODO.md for more info.
 
 NOTE: REPORT ALL BUGS. ISSUE TRACKER IS ENABLED AND AWAITING YOUR REPORT

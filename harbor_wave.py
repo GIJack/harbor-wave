@@ -186,7 +186,7 @@ def check_dns(loaded_config):
         return False
 
 def convert_datestamp(in_date):
-    '''takes a string from droplet.createdate, and returns a python time object'''
+    '''takes a string from droplet.createdate, and returns a python datetime object'''
     # this is the format that createdate returns
     # see: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
     do_timeformat = "%Y-%m-%dT%XZ"

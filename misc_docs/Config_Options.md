@@ -34,14 +34,14 @@ with destroy. Indivual machines are named vm-base-name + N. destroy matches
 against machines that have the correct tag and start with vm-base-name.
 
 **vm-size**(*string*) Size code for new droplets. This will determine things
-like Hard Disk, CPU and RAM. see _list vm-sizes_ for codes and what they
+like Hard Disk, CPU and RAM. see **list vm-sizes** for codes and what they
 do.
 
 **vm-template**(*string*) ID of template for creating new machines with spawn.
 See _list templates_ for valid entries
 
 **use-dns**(*bool*) To use FQDNs and create DNS entries for machines spawned.
-*domain* item also needs to be set.
+**domain** item also needs to be set.
 
 default: *False*
 

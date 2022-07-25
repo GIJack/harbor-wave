@@ -27,7 +27,7 @@ that will be used with new machines spawned.
 
 **tag**(*string*) Droplet tag used to identify harborwave machines. spawn will
 make droplets with this tag, and list and destroy will only match droplets with
-this tag.  Default: harborwave
+this tag.  Default: *harborwave*
 
 **vm-base-name**(*string*) Basename for VMs created with spawn and destroyed
 with destroy. Indivual machines are named vm-base-name + N. destroy matches

@@ -209,7 +209,7 @@ def check_and_connect(loaded_config):
     needed_keys = ("api-key","domain","region","ssh-key-n","vm-base-name","vm-size","vm-template","use-dns")
     for key in needed_keys:
         if key not in loaded_config.keys():
-            exit_with_error(2,key + " not set. see --help on set")
+            exit_with_error(2,key + " not set. see help config")
     
     api_key = loaded_config['api-key']
     if check_api_key(api_key) != True:
@@ -607,7 +607,7 @@ def set_config(config_dir,loaded_config,item,value):
     elif value == None or value == "":
         value = default_config[item]
     elif item not in all_set_items:
-        exit_with_error(2, "set: " + item + " is not a valid config item" )
+        exit_with_error(2, "set: " + item + " is not a valid config item, see help config" )
     # Check and set type
     if item in set_item_str:
         try:
@@ -683,7 +683,7 @@ def get_config(loaded_config,item):
     if item in restricted_list:
         exit_with_error(2,"get: Won't print " + item + "... ")
     if item not in loaded_config.keys():
-        exit_with_error(2,"get: No such config item: " + item)
+        exit_with_error(2,"get: No such config item: " + item + ". See help config")
     
     output = loaded_config[item]
     output = str(output)

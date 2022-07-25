@@ -107,6 +107,8 @@ import os,sys
 import argparse
 import json
 import digitalocean
+from datetime import datetime, tzinfo, timedelta
+from zoneinfo import ZoneInfo
 
 default_config = {
     "domain"       : "",
@@ -182,7 +184,24 @@ def check_dns(loaded_config):
         return True
     else:
         return False
-        
+
+def convert_datestamp(in_date):
+    '''takes a string from droplet.createdate, and returns a python time object'''
+    # this is the format that createdate returns
+    # see: https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+    do_timeformat = "%Y-%m-%dT%XZ"
+    do_timezone   = ZoneInfo("Zulu")
+    local_tz      = datetime.now().astimezone().tzinfo
+    
+    # get a timedate object out of Digital Ocean's formating, including re-add timezone
+    date_obj  = datetime.strptime(in_date,do_timeformat)
+    date_obj  = date_obj.replace(tzinfo=do_timezone)
+    # convert to local date
+    date_obj  = date_obj.astimezone(local_tz)
+    # strip timezone because otherwise maths don't work. ?!?!?
+    date_obj = date_obj.replace(tzinfo=None)
+    return date_obj
+
 def check_and_connect(loaded_config):
     '''give the loaded config, check the API key, and return a DO manager session'''
     
@@ -213,17 +232,24 @@ def list_machines(loaded_config,terse=False):
         exit_with_error(2,"list: DataReadError, check settings and try again")
     
     tab_spacing = 20
-    header  = colors.bold + "NAME\tIP ADDRESS\tREGION\tSIZE\tTEMPLATE\t\tDATESTAMP".expandtabs(tab_spacing) + colors.reset
+    header  = colors.bold + "NAME\tIP ADDRESS\tREGION\tSIZE\tTEMPLATE\t\tTIME RUNNING(H:M:S.uS)".expandtabs(tab_spacing) + colors.reset
     out_line = ""
     if terse == False:
         print(header)
         for droplet in droplet_list:
-            out_line = droplet.name + "\t" + str(droplet.ip_address) + "\t" + droplet.region['slug'] + "\t" + droplet.size['slug'] + "\t" + droplet.image['name'] + "\t" + droplet.created_at
+            # get how long machine has been running
+            droplet_start_obj = convert_datestamp(droplet.created_at)
+            time_running = datetime.now() - droplet_start_obj
+            time_running = str(time_running)
+            out_line = droplet.name + "\t" + str(droplet.ip_address) + "\t" + droplet.region['slug'] + "\t" + droplet.size['slug'] + "\t" + droplet.image['name'] + "\t" + time_running
             out_line = out_line.expandtabs(tab_spacing)
             print(out_line)
     elif terse == True:
         for droplet in droplet_list:
-            out_line = droplet.name + "," + droplet.ip_address + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + droplet.created_at
+            droplet_start_obj = convert_datestamp(droplet.created_at)
+            time_running = datetime.now() - droplet_start_obj
+            time_running = str(time_running)
+            out_line = droplet.name + "," + droplet.ip_address + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + time_running
             print(out_line)
     else:
         exit_with_error(10,"list: machines: terse is neither True nor False, should never get here, debug!")

@@ -199,7 +199,7 @@ def convert_datestamp(in_date):
     # convert to local date
     date_obj  = date_obj.astimezone(local_tz)
     # strip timezone because otherwise maths don't work. ?!?!?
-    date_obj = date_obj.replace(tzinfo=None)
+    date_obj  = date_obj.replace(tzinfo=None)
     return date_obj
 
 def check_and_connect(loaded_config):

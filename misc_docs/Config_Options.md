@@ -22,8 +22,8 @@ region, but list will show all regions, and destroy terminate accross all region
 
 Default: _nyc1_
 
-**ssh-key-n**(*int*) Interger. Index of SSH-key on your digital ocean account
-that will be used with new machines spawned.
+**ssh-key-n**(*int*) Index of SSH-key on your digital ocean account
+that will be used with new machines spawned. see *list ssh-keys*
 
 **tag**(*string*) Droplet tag used to identify harborwave machines. spawn will
 make droplets with this tag, and list and destroy will only match droplets with

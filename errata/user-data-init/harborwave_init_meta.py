@@ -12,10 +12,10 @@ from http.client import responses as http_responses
 from datetime import datetime
 
 config = {
-    'host'            : '169.254.169.254',
-    'path'            : '/metadata/v1/user-data',
-    'timeout'         : 3, # timeout, in seconds, for URL query
-    'logfile'         : "/var/log/harbor-wave-init.log",
+    'host'    : '169.254.169.254',
+    'path'    : '/metadata/v1/user-data',
+    'timeout' : 3, # timeout, in seconds, for URL query
+    'logfile' : "/var/log/harbor-wave-init.log",
     'app-dir' : '/opt/harborwave',
 }
 

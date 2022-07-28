@@ -528,7 +528,7 @@ def spawn_machines(loaded_config,N=1):
     fails = 0
     for i in range(N):
         user_meta = { "sequence" : int(i), "base-name":loaded_config['vm-base-name'], "payload":meta_payload }
-        user_meta = json.dumps(user_meta,indent=4)
+        user_meta = json.dumps(user_meta,indent=2)
         vm_name   = loaded_config['vm-base-name'] + str(i)
         msg_line  = vm_name + " created"
         try:

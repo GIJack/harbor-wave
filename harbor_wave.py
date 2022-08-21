@@ -767,10 +767,10 @@ def check_and_load_config(config_dir):
 
 def main():
     parser = argparse.ArgumentParser(description=full_help_banner,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", nargs="?"   ,help="See above for description of commands")
-    parser.add_argument("arguments", nargs="*" ,help="Arguments for command, see above")
-    parser.add_argument("-?","--help"          ,help="Show This Help Message", action="help")
-    parser.add_argument("-T","--terse"         ,help="when using list or print-config, print CSV format instead of justified tab tables. Does nothing for other options",action="store_true")
+    parser.add_argument("command", nargs="?"    ,help="See above for description of commands")
+    parser.add_argument("arguments", nargs="*"  ,help="Arguments for command, see above")
+    parser.add_argument("-?","--help"           ,help="Show This Help Message", action="help")
+    parser.add_argument("-T","--terse"          ,help="when using list or print-config, print CSV format instead of justified tab tables. Does nothing for other options",action="store_true")
 
     config_overrides = parser.add_argument_group("Config Overrides","Configuration Overrides, lower case")
     config_overrides.add_argument("-a","--api-key"    ,help="Digitial Ocean API key to use",type=str)

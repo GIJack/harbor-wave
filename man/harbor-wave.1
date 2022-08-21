@@ -59,7 +59,7 @@ topics: config, commands
 
 .BR spawn \t \fR\fI<N>\fR
 
-Create N new virtual machines. machines are named using vm-base-name and a
+Create N new virtual machines. machines are named using base-name and a
 numerical suffix, iterated, count from 0.
 
 .BR destroy \t \fR\fI<"ALL">\fR
@@ -104,7 +104,7 @@ Stop after processing config. Useful for generating a new config with defaults
 .BR ssh-keys
 \t List SSH keys in your account, with index value
 
-.BR vm-sizes
+.BR sizes
 \t List size codes with descritions and cost
 
 .BR money-left
@@ -146,15 +146,15 @@ new machines spawned. see list-ssh keys for available options
 . spawn will make droplets with this tag, and list and destroy will only match
 droplets with this tag.  Default: harborwave
 
-.BR vm-base-name
+.BR base-name
 \t Basename for VMs created with spawn and
-destroyed with destroy. Indivual machines are named vm-base-name + N. destroy
-matches against machines that have the correct tag and start with vm-base-name.
+destroyed with destroy. Indivual machines are named base-name + N. destroy
+matches against machines that have the correct tag and start with base-name.
 
-.BR vm-size
-\t Size code for new droplets. see list vm-sizes.
+.BR size
+\t Size code for new droplets. see list sizes.
 
-.BR vm-template
+.BR template
 \t ID of template for creating new machines with spawn. see list templates for
 valid entries
 
@@ -188,16 +188,16 @@ list and print-config commands uses CSV format for output. Does nothing for all 
 .BR "-k, --ssh-key-n" \fR \t SSH_KEY_N
 \t Interger: index of the SSH-key to use on the created hosts. Default: 0
 
-.BR "-n, --vm-base-name" \fR \t VM_BASE_NAME
+.BR "-n, --base-name" \fR \t VM_BASE_NAME
 \t Base-name for spawn'ing new VMs.
 
 .BR "-r, --region" \fR \t REGION
 \t Digital Ocean four character region code. Where new machines are spawned.
 
-.BR "-s, --vm-size" \fR \t VM_SIZE
+.BR "-s, --size" \fR \t VM_SIZE
 \t Digital Ocean size code for new machines
 
-.BR "-t, --vm-template" \fR \t TEMPLATE_ID
+.BR "-t, --template" \fR \t TEMPLATE_ID
 \t ID of custom template that gets used to make new machines.
 
 .BR "-u, --use-dns"

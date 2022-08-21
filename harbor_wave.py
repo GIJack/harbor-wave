@@ -37,24 +37,24 @@ command_help='''
       ssh-keys   - List SSH-keys on the account. use INDEX for ssh-key-n config
       item with set
   
-      vm-sizes   - List of valid vm size codes for use in config
+      sizes      - List of valid vm size codes for use in config
       
       money-left - How much $$$ you have left on your DO account. also shows
       "Burn Rate", the rate of which harbor-wave machines cost money. burn-rate
       is in dollars per hour, and only shows money used by harbor-wave machines,
       not the entirity for the account.
       
-    example: harbor-wave list vm-sizes
+    example: harbor-wave list sizes
 
   spawn <N> - Create a new N new VMs. default is 1
 
-  destroy <"ALL">- Destroy VMs. If ALL is appended, then all harbor-wave VMs
+  destroy <"ALL"> - Destroy VMs. If ALL is appended, then all harbor-wave VMs
   will be destroyed, based on tag.
   
   set [item] [value] - set a config item. See bellow for list of config items.
   Setting a value of "" will reset this item to its default value
 
-  get [item] - print value for item, see bellow for list of config items
+  get [item]     - print value for item, see bellow for list of config items
   
   print-config   - print all config items in pretty table.
 
@@ -86,14 +86,14 @@ config_help='''
    tag         - tag to use for the droplets that harbor-wave will use to
    recognize its own. Default: harborwave
       
-   vm-base-name - what to call droplets that will be spawned, if more than one
+   base-name - what to call droplets that will be spawned, if more than one
    is spawned, this will be the base, and new names will be incremented. At
    current this will be numeric. Might change in the future(perhaps name-sets)
    
-   vm-size     - Size code new droplets.  See list vm-sizes for list of size
-   codes and their descriptions. Default: s-1vcpu-1gb.
+   size     - Size code new droplets.  See list sizes for list of size codes and
+   their descriptions. Default: s-1vcpu-1gb.
    
-   vm-template - ID of the custom template image for spawning droplets. You can
+   template - ID of the custom template image for spawning droplets. You can
    get a list of valid values with list templates
    
    use-dns     - Use fully qualified domain names for droplet host names, and
@@ -117,9 +117,9 @@ default_config = {
     "region"       : "nyc1",
     "ssh-key-n"    : 0,
     "tag"          : "harborwave",
-    "vm-base-name" : "",
-    "vm-size"      : "s-1vcpu-1gb",
-    "vm-template"  : "",
+    "base-name" : "",
+    "size"      : "s-1vcpu-1gb",
+    "template"  : "",
     "use-dns"      : False
 }
 
@@ -206,7 +206,7 @@ def check_and_connect(loaded_config):
     '''give the loaded config, check the API key, and return a DO manager session'''
     
     # check to make sure we have the right config options
-    needed_keys = ("api-key","domain","region","ssh-key-n","vm-base-name","vm-size","vm-template","use-dns")
+    needed_keys = ("api-key","domain","region","ssh-key-n","base-name","size","template","use-dns")
     for key in needed_keys:
         if key not in loaded_config.keys():
             exit_with_error(2,key + " not set. see help config")
@@ -442,7 +442,7 @@ def list_ssh_keys(loaded_config,terse=False):
 
 def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
     '''Creates a single virtual-machine, uses machine_name variable for name,
-    ignores vm-base-name in config. This is a base class that does no checking
+    ignores base-name in config. This is a base class that does no checking
     or iteration. must also pass the SSH key, to only have to load it once
     Also does not mess with DNS. returns True or False, depending on if success
     or not
@@ -452,8 +452,8 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
     new_vm  = digitalocean.Droplet(token=loaded_config['api-key'],
                                     name=machine_name,
                                     region=loaded_config['region'],
-                                    image=loaded_config['vm-template'],
-                                    size_slug=loaded_config['vm-size'],
+                                    image=loaded_config['template'],
+                                    size_slug=loaded_config['size'],
                                     tags=[ loaded_config['tag'] ],
                                     ssh_keys= [ ssh_key ],
                                     user_data=user_meta,
@@ -487,8 +487,8 @@ def spawn_machines(loaded_config,N=1):
     manager = check_and_connect(loaded_config)
     
     #Some more checks
-    if len(loaded_config["vm-base-name"]) < 1:
-        exit_with_error(2,"spawn: vm-base-name needs to be at least one char for this to work!")
+    if len(loaded_config["base-name"]) < 1:
+        exit_with_error(2,"spawn: base-name needs to be at least one char for this to work!")
     try:
         N = int(N)
     except:
@@ -522,14 +522,14 @@ def spawn_machines(loaded_config,N=1):
     else:
         meta_payload = loaded_config['payload']
     
-    banner = "Spawning machine series: " + loaded_config['vm-base-name'] + ", " + str(N) + " machines(s)"
+    banner = "Spawning machine series: " + loaded_config['base-name'] + ", " + str(N) + " machines(s)"
     message(banner)
     # spawn N machines
     fails = 0
     for i in range(N):
-        user_meta = { "sequence" : int(i), "base-name":loaded_config['vm-base-name'], "payload":meta_payload }
+        user_meta = { "sequence" : int(i), "base-name":loaded_config['base-name'], "payload":meta_payload }
         user_meta = json.dumps(user_meta,indent=2)
-        vm_name   = loaded_config['vm-base-name'] + str(i)
+        vm_name   = loaded_config['base-name'] + str(i)
         msg_line  = vm_name + " created"
         try:
             create_machine(loaded_config,vm_name,use_key,user_meta)
@@ -552,7 +552,7 @@ def destroy_machines(loaded_config,args=[]):
 
     manager   = check_and_connect(loaded_config)
     vm_tag    = loaded_config['tag']
-    base_name = loaded_config['vm-base-name']
+    base_name = loaded_config['base-name']
     
     # get a list of machines to delete
     try:
@@ -594,7 +594,7 @@ def set_config(config_dir,loaded_config,item,value):
     config_file_name = "harbor-wave.cfg"
     api_file         = config_dir + "/" + api_file_name
     config_file      = config_dir + "/" + config_file_name
-    set_item_str     = ["api-key","domain", "vm-base-name","payload","project","vm-size","region","vm-template", "tag"]
+    set_item_str     = ["api-key","domain", "base-name","payload","project","size","region","template", "tag"]
     set_item_int     = ["ssh-key-n"]
     set_item_bool    = ["use-dns"]
     all_set_items    = set_item_str + set_item_int + set_item_bool
@@ -778,11 +778,11 @@ def main():
     config_overrides.add_argument("-g","--tag"              ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
     config_overrides.add_argument("-k","--ssh-key-n"        ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
     config_overrides.add_argument("-l","--payload"          ,help="Aribtrary content that gets sent to every spawned machine via user-data in API. if FILE: is specified, local file is read and used as a payload as a string",type=str)
-    config_overrides.add_argument("-n","--vm-base-name"     ,help="Base Name For New VMs",type=str)
+    config_overrides.add_argument("-n","--base-name"     ,help="Base Name For New VMs",type=str)
     config_overrides.add_argument("-p","--project"          ,help="name of project in account where new machines spawn. If blank default is used",type=str)
     config_overrides.add_argument("-r","--region"           ,help="Region code. Specify what datacenter this goes in",type=str)
-    config_overrides.add_argument("-s","--vm-size"          ,help="Size code for new VMs",type=str)
-    config_overrides.add_argument("-t","--vm-template"      ,help="Image Template for spawning new VMs",type=str)
+    config_overrides.add_argument("-s","--size"          ,help="Size code for new VMs",type=str)
+    config_overrides.add_argument("-t","--template"      ,help="Image Template for spawning new VMs",type=str)
     config_overrides.add_argument("-u","--use-dns"          ,help="Use FQDNs for naming VMs and add DNS entries in Networking. NOT IMPLEMENNTED YET",action="store_true")
 
     args = parser.parse_args()
@@ -809,12 +809,12 @@ def main():
         loaded.config['region']        = args.region
     if args.ssh_key_n != None:
         loaded_config['ssh-key-n']     = args.ssh_key_n
-    if args.vm_base_name != None:
-        loaded_config ['vm-base-name'] = args.vm_base_name
-    if args.vm_size != None:
-        loaded_config['vm-size']       = args.vm_size
-    if args.vm_template != None:
-        loaded_config['vm-template']   = args.vm_template
+    if args.base_name != None:
+        loaded_config ['base-name']    = args.base_name
+    if args.size != None:
+        loaded_config['size']          = args.size
+    if args.template != None:
+        loaded_config['template']      = args.template
     if args.use_dns == True:
         loaded_config['use-dns']       = True
 
@@ -855,7 +855,7 @@ def main():
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
         if option == "help":
-            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, vm-sizes, and money-left. See  --help for more info"
+            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, sizes, and money-left. See  --help for more info"
             print(output_line)
         elif option == "machines":
             list_machines(loaded_config,args.terse)
@@ -867,7 +867,7 @@ def main():
             list_regions(loaded_config,args.terse)
         elif option == "ssh-keys":
             list_ssh_keys(loaded_config,args.terse)
-        elif option == "vm-sizes":
+        elif option == "sizes":
             list_sizes(loaded_config,args.terse)
         elif option == "money-left":
             list_account_balance(loaded_config,args.terse)

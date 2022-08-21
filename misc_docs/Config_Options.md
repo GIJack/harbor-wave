@@ -29,15 +29,15 @@ that will be used with new machines spawned. see *list ssh-keys*
 make droplets with this tag, and list and destroy will only match droplets with
 this tag.  Default: *harborwave*
 
-**vm-base-name**(*string*) Basename for VMs created with spawn and destroyed
+**base-name**(*string*) Basename for VMs created with spawn and destroyed
 with destroy. Indivual machines are named vm-base-name + N. destroy matches
 against machines that have the correct tag and start with vm-base-name.
 
-**vm-size**(*string*) Size code for new droplets. This will determine things
+**size**(*string*) Size code for new droplets. This will determine things
 like Hard Disk, CPU and RAM. see _list vm-sizes_ for codes and what they
 do.
 
-**vm-template**(*string*) ID of template for creating new machines with spawn.
+**template**(*string*) ID of template for creating new machines with spawn.
 See _list templates_ for valid entries
 
 **use-dns**(*bool*) To use FQDNs and create DNS entries for machines spawned.

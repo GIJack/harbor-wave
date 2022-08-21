@@ -31,3 +31,4 @@ machines.
 * better support for more than one application, besides simply specifying -n
 in run time or scripting with set vm-base-name
 * use multiple reigons for spawning new machines
+* cloud-init phone-home examples for passing notifications on donnage?

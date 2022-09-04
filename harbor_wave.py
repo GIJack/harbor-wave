@@ -509,7 +509,8 @@ def spawn_machines(loaded_config,N=1):
             exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
 
     # Load payload from file, if applicable
-    meta_payload = None
+    meta_payload  = ""
+    meta_filename = ""
     if loaded_config['payload'].startswith("FILE:") == True:
         # get filename as everythinng after first ':'
         meta_filename = loaded_config['payload'].split(":")[1:]
@@ -528,8 +529,9 @@ def spawn_machines(loaded_config,N=1):
     message(banner)
     # spawn N machines
     fails = 0
+    meta_filename = os.path.basename(meta_filename)
     for i in range(N):
-        user_meta = { "sequence" : int(i), "base-name":loaded_config['base-name'], "payload":meta_payload }
+        user_meta = { "sequence" : int(i), "base-name":loaded_config['base-name'], "payload":meta_payload, "payload-filename":meta_filename }
         user_meta = json.dumps(user_meta,indent=2)
         vm_name   = loaded_config['base-name'] + str(i)
         msg_line  = vm_name + " created"

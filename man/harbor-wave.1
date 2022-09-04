@@ -34,12 +34,14 @@ end of the spawn command.
 
 in addition, the sequence number is added to the machines meta-data that can
 be retrieved via the API from within the machine in JSON format, that has
-"sequence":N and "base-name":string, and "payload":string, keys.
+"sequence":N and "base-name":string, "payload":string, and
+"payload-filename":string keys.
 
 {
     "sequence":N
     "base-name":"name"
     "payload":<...>
+    "payload-filename":<from FILE:>
 }
 
 where N is the sequence number of the machine

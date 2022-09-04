@@ -135,3 +135,4 @@ sequence: Interger, sequence number of the machine spawned
 base-name: base name of the hostname
 payload: arbitrary string from config or command line, that allows input data
 to be given to the machines at spawn time
+payload-file: if payload is from a file using FILE:, the name of this file.

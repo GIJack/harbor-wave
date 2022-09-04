@@ -71,9 +71,9 @@ and then edit ~/.config/harbor-wave
 *OR*
 
 ```
-harbor-wave set region <region_slug>
 harbor-wave set api-key <your_do_api_key>
-harbor-wave set vm-base-name <base_name_for_vm>
+harbor-wave set base-name <base_name_for_vm>
+harbor-wave set template <template_id>
 harbor-wave set ssh-key-n <N> #index of SSH key
 ```
 
@@ -104,7 +104,7 @@ harbor-wave list machines
 List available config values, as pulled from DO servers:
 ```
 harbor-wave list regions
-harbor-wave list vm-sizes
+harbor-wave list sizes
 harbor-wave list templates
 harbor-wave list ssh-keys
 ```
@@ -120,7 +120,7 @@ harbor-wave list money-left
 For more info see either
 ```
 man 1 harbor-wave
-harbor-wave --help
+harbor-wave help
 ```
 
 User-data

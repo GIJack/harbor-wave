@@ -16,6 +16,12 @@ This script does three things:
 values to /etc/environment so they can easily be refrenced by an application
 on the droplet/machine spawned
 
-99\_harborwave-init.cfg -
-Put this in /etc/cloud/cloud.cfg.d on your rootoverlay/ when you are building
-your app. This will run the python script above on first boot
+HOW TO
+-------
+
+harborwave-runonce.service - put this in your systemd service folder and
+enable it with systemctl.
+
+normal systemd service folder - /usr/local/systemd/system.
+
+harborwave\_init\_meta.py - install this as /root/harborwave\_init\_meta.py

@@ -1,0 +1,12 @@
+[Unit]
+Description=Harbor-wave Metadata RunOnce
+After=network.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=True
+ExecStart=/root/harborwave_init_meta.py
+
+[Install]
+WantedBy=multi-user.target

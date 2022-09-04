@@ -12,11 +12,12 @@ from http.client import responses as http_responses
 from datetime import datetime
 
 config = {
-    'host'    : '169.254.169.254',
-    'path'    : '/metadata/v1/user-data',
-    'timeout' : 3, # timeout, in seconds, for URL query
-    'logfile' : "/var/log/harbor-wave-init.log",
-    'app-dir' : '/opt/harborwave',
+    'host'      : '169.254.169.254',
+    'path'      : '/metadata/v1/user-data',
+    'timeout'   : 3, # timeout, in seconds, for URL query
+    'logfile'   : "/var/log/harbor-wave-init.log",
+    'app-dir'   : '/opt/harborwave',
+    'done-file' : '/opt/harborwave/done',
 }
 
 def message(message):
@@ -112,7 +113,7 @@ def write_payload(data):
 
 def write_done():
     '''Touch /opt/harbor-wave/done so we know this script ran already'''
-    done_file = config['app-dir'] + "/done"
+    done_file = config['done-file']
     try:
         file_obj = open(done_file,"w")
         file_obj.write("\n")
@@ -126,6 +127,11 @@ def write_done():
 def main():
     message("Getting and parsing Harbor-Wave data from Digital Ocean API")
     WARNS = 0
+    # Check if this script ran already
+    if os.path.exists(config['done-file']) == True:
+        warn("Script ran already, doing nothing and exiting")
+        sys.exit(0)
+    
     # ensure directory is available
     os.makedirs(config['app-dir'],mode=0o755,exist_ok=True)
     
@@ -138,6 +144,7 @@ def main():
     submsg("Extracting payload")
     WARNS += write_payload(data)
     
+    submsg("Writing donefile")
     WARNS += write_done()
     
     if WARNS > 0:

@@ -60,6 +60,8 @@ command_help='''
 
   touch          - Stop after proccessing initial config. useful for generating
   blank config file. Will not touch the api-key
+  
+  check-config   - checks if your config settings are valid items
 '''
 config_help='''
         CONFIG ITEMS:
@@ -139,7 +141,7 @@ def exit_with_error(exit,message):
     sys.exit(exit)
 
 def submsg(message):
-    print("[+]\t" + message)
+    print("\t" + message)
     
 def warn(message):
     print("harbor-wave:" + colors.yellow + colors.bold + " ¡WARN!: " + colors.reset + message, file=sys.stderr)
@@ -648,6 +650,144 @@ def set_config(config_dir,loaded_config,item,value):
     except:
         exit_with_error(2,"set: Could not write to config file")
 
+def check_and_print_config(loaded_config,terse=False):
+    '''Check Configuration and print results of each item to the screen'''
+    errors    = 0
+    tab_space = 25
+    INVALID   = colors.red + colors.bold + "INVALID" + colors.reset
+    OK        = colors.cyan + colors.bold + "OK" + colors.reset
+
+    message("Checking config items for validity...")
+    ## Start with offline checks
+    # Basename - needs to be a string at least two characters, and alphanumeric
+    out_line = "Base-name:\t".expandtabs(tab_space)
+    if type(loaded_config['base-name']) != str:
+        out_line += INVALID
+        errors   += 1
+    elif len(loaded_config['base-name']) < 2:
+        out_line += INVALID
+        errors   += 1
+    elif loaded_config['base-name'].isalnum() == False:
+        out_line += INVALID
+        errors   += 1
+    else:
+        out_line += OK
+    print(out_line)
+    
+    # Tag
+    out_line = "Tag:\t".expandtabs(tab_space)
+    if type(loaded_config['tag']) != str:
+        out_line += INVALID
+        errors   += 1
+    elif len(loaded_config['tag']) < 2:
+        out_line += INVALID
+        errros   += 1
+    else:
+        out_line += OK
+    print(out_line)
+    
+    # Payload - if FILE: is specified, check file
+    if loaded_config['payload'] != "":
+        payload = loaded_config['payload'].split(":")
+        if payload[0] == "FILE":
+            out_line = "Payload File:\t".expandtabs(tab_space)
+            file_name = " ".join(payload[1:])
+            if os.path.exists(file_name):
+                out_line += colors.bold + colors.cyan + "Exists" + colors.reset
+            else:
+                out_line += colors.bold + colors.red + "Not Found" + colors.reset
+            print(out_line)
+
+    # Check API key
+    api_key = loaded_config['api-key']
+    out_line = "API Key:\t".expandtabs(tab_space)
+    if check_api_key(api_key) != True:
+        exit_with_error(2,"config-check: API key is not set or not set or not a key-like object")
+    else:
+        out_line += OK
+    print(out_line)
+    
+    ## Online Checks
+    # Open a sessions
+    manager = digitalocean.Manager(token=api_key)
+    
+    # Check API Key
+    out_line = "Account:\t".expandtabs(tab_space)
+    try:
+        account   = manager.get_account()
+        out_line += OK
+    except:
+        account   = None
+        out_line += INVALID
+    print(out_line)
+    if account == None:
+        sys.exit(1)
+        
+    # Reigons
+    regions_objs = manager.get_all_regions()
+    region_list  = []
+    for item in regions_objs:
+        region_list.append(item.slug)
+    out_line="Region:\t".expandtabs(tab_space)
+    if loaded_config['region'] in region_list:
+        out_line += OK
+    else:
+        out_line += INVALID
+        errors   += 1
+    print(out_line)
+    
+    # SSH Key
+    ssh_keys_obj = manager.get_all_sshkeys()
+    out_line="SSH-Key-N:\t".expandtabs(tab_space)
+    # check the key id is an INT, and within range of key ids
+    if type(loaded_config['ssh-key-n']) != int:
+        out_line += INVALID
+        errors   += 1
+    else:
+        max_key_id = len(ssh_keys_obj) - 1
+        if 0 <= loaded_config['ssh-key-n'] <= max_key_id:
+            out_line += OK
+        else:
+            out_line += INVALID
+            errors   += 1
+    print(out_line)
+    
+    # Project
+    projects_objs = manager.get_all_projects()
+    project_list  = []
+    for item in projects_objs:
+        project_list.append(item.name)
+    out_line="Project:\t".expandtabs(tab_space)
+    if loaded_config['project'] in project_list:
+        out_line += OK
+    else:
+        out_line += INVALID
+        errors   += 1
+    print(out_line)
+    
+    # Template
+    images_objs = manager.get_my_images()
+    template_list = []
+    out_line = "Template:\t".expandtabs(tab_space)
+    for item in images_objs:
+        if item.type == "custom":
+            template_list.append(item.id)
+    if int(loaded_config['template']) in template_list:
+        out_line += OK
+    else:
+        out_line += INVALID
+        errors   += 1
+    print(out_line)
+    
+    if errors == 0:
+        out_line = colors.cyan + colors.bold + "CONFIG OK" + colors.reset + ". There were no errors. spawn should work"
+        print(out_line)
+        sys.exit(0)
+    else:
+        out_line = colors.red + colors.bold + str(errors) + " Config Errors" + colors.reset + ". Check above and correct before running harbor-wave spawn"
+        print(out_line)
+        sys.exit(9)
+
 def print_config(loaded_config,terse=False):
     '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''
     restricted_list = ['api-key']
@@ -885,6 +1025,8 @@ def main():
         else:
             options = []
         destroy_machines(loaded_config,options)
+    elif args.command == "check-config":
+        check_and_print_config(loaded_config,args.terse)
     else:
         exit_with_error(2,"No such command. See --help")
 

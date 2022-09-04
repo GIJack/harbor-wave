@@ -50,4 +50,4 @@ you'd need to set as config items. The leftmost column is always the one that
 harbor-wave needs for settings.
 
 **HELP** *\<COMMAND\|CONFIG\>*		Prints the help message,
-sub commands of command and config for just help and config or commands
+sub commands of command and config for just help with config or commands

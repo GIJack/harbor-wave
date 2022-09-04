@@ -12,7 +12,7 @@ ACTIONS
 machines using previously set settings, or --overide options. If N is not
 specified, then 1 is the default.
 
-**DESTROY** <ALL>	Destroy all virtual machines that match "tag" from
+**DESTROY** *\<ALL\>*	Destroy all virtual machines that match "tag" from
 settings, and their name begins with "base-name". if ALL in all caps is
 specified, then all machines with matching "tag" are deleted, not just those
 matching "base-name". The idea would be normally this will just take down only
@@ -49,5 +49,5 @@ OTHER
 you'd need to set as config items. The leftmost column is always the one that
 harbor-wave needs for settings.
 
-**HELP** <COMMAND|CONFIG>		Prints the help message,
+**HELP** *\<COMMAND\|CONFIG\>*		Prints the help message,
 sub commands of command and config for just help and config or commands

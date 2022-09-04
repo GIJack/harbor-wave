@@ -71,7 +71,7 @@ def get_data(config):
         exit_with_error(9,"Data isn't in the JSON format, are you sure this is a harbor-wave VM?")
     
     # check to make sure all fields are there
-    needed_keys = ['sequence', 'base-name', 'payload']
+    needed_keys = ['sequence', 'base-name', 'payload','payload-filename']
     data_keys = output_data.keys()
     missing_keys = []
     for item in needed_keys:
@@ -100,7 +100,13 @@ def write_environment(data):
 
 def write_payload(data):
     '''write payload file'''
-    payload_file = config['app-dir'] + "/payload"
+    
+    payload_dir = config['app-dir'] + "/payload"
+    os.makedirs(payload_dir,mode=0o755,exist_ok=True)
+    if data['payload-filename'] != "":
+        payload_file = payload_dir + "/" + data['payload-filename']
+    else:
+        payload_file = payload_dir + "/data"
     try:
         file_obj = open(payload_file,"w")
         file_obj.write(data['payload'])

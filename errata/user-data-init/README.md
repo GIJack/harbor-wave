@@ -11,7 +11,9 @@ this in the rootoverlay/ folder
 harborwave\_init_\meta.py -
 This script does three things:
 1. download metadata from digital ocean API
-2. extract payload and save it as a file in /opt/harbor-wave/payload
+2. extract payload and save it as a file in the /opt/harbor-wave/payload
+directory. It is saved as its original filename if FILE: was in the payload. If
+there was no filename, then the file is just named "data"
 3. add HARBORWAVE\_SEQUENCE and HARBORWAVE\_BASENAME and their corresponding
 values to /etc/environment so they can easily be refrenced by an application
 on the droplet/machine spawned

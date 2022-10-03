@@ -9,7 +9,7 @@ install:
 	chmod 755 "$(DESTDIR)/$(PREFIX)/bin/harbor-wave"
 	
 remove:
-	rm "$(DESTDIR)/$(PREFIX)/share/harbor-wave/harbor_wave.py"
-	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/harbor-wave.1"
-	rm "$(DESTDIR)/usr/share/bash-completion/completions/harbor-wave"
-	rm "$(DESTDIR)/$(PREFIX)/bin/harbor-wave"
+	rm -f "$(DESTDIR)/$(PREFIX)/share/harbor-wave/harbor_wave.py"
+	rm -f "$(DESTDIR)/$(PREFIX)/share/man/man1/harbor-wave.1"
+	rm -f "$(DESTDIR)/usr/share/bash-completion/completions/harbor-wave"
+	rm -f "$(DESTDIR)/$(PREFIX)/bin/harbor-wave"

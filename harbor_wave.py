@@ -812,6 +812,21 @@ def check_and_print_config(loaded_config,terse=False):
         errors   += 1
     print(out_line)
     
+    # Domain
+    domains = manager.get_all_domains()
+    domain_list = []
+    out_line = "Domain:\t".expandtabs(tab_space)
+    for domain in domains:
+        domain_list.append(domain.name)
+    if loaded_config['use-dns'] != True:
+        out_line += "use-dns set to False, skipping"
+    elif loaded_config['domain'] in domain_list:
+        out_line += OK
+    else:
+        out_line += INVALID
+        errors  += 1
+    print(out_line)
+    
     if errors == 0:
         out_line = colors.cyan + colors.bold + "CONFIG OK" + colors.reset + ". There were no errors. spawn should work"
         print(out_line)
@@ -820,6 +835,8 @@ def check_and_print_config(loaded_config,terse=False):
         out_line = colors.red + colors.bold + str(errors) + " Config Errors" + colors.reset + ". Check above and correct before running harbor-wave spawn"
         print(out_line)
         sys.exit(9)
+
+
 
 def print_config(loaded_config,terse=False):
     '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''

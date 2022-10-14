@@ -6,7 +6,7 @@ install:
 	install -Dm644 man/harbor-wave.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/harbor-wave.1"
 	install -Dm644 bash-completion/harbor-wave "$(DESTDIR)/usr/share/bash-completion/completions/harbor-wave"
 	install -dm755 "$(DESTDIR)/$(PREFIX)/bin/"
-	echo "$(PREFIX)/share/harbor-wave/harbor_wave.py \$$@" > "$(DESTDIR)/$(PREFIX)/bin/harbor-wave"
+	echo "$(PREFIX)/share/harbor-wave/harbor_wave.py \"\$$@\"" > "$(DESTDIR)/$(PREFIX)/bin/harbor-wave"
 	chmod 755 "$(DESTDIR)/$(PREFIX)/bin/harbor-wave"
 	install -Dm644 misc_docs/Commands.md "$(DESTDIR)/$(PREFIX)/share/harbor-wave/docs/Commands.md"
 	install -Dm644 misc_docs/Config_Options.md "$(DESTDIR)/$(PREFIX)/share/harbor-wave/docs/Config_Options.md"

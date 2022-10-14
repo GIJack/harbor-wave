@@ -32,12 +32,16 @@ command_help='''
 
       templates  - Show available custom images.
   
-      regions    - List valid region codes for use in config
+      regions    - List valid region codes for use in config, pulled from the
+      API
       
       ssh-keys   - List SSH-keys on the account. use INDEX for ssh-key-n config
       item with set
   
-      sizes      - List of valid vm size codes for use in config
+      sizes      - List of valid vm size codes for use in config returned from
+      the API
+      
+      domains    - List of DNS domains associated with the account
       
       money-left - How much $$$ you have left on your DO account. also shows
       "Burn Rate", the rate of which harbor-wave machines cost money. burn-rate
@@ -441,6 +445,33 @@ def list_ssh_keys(loaded_config,terse=False):
             print(out_line)
     else:
         exit_with_error(10,"list ssh-keys: terse is neither true nor false, this should not be, debug!")
+
+def list_domains(loaded_config,terse=False):
+    # get Domains
+    manager = check_and_connect(loaded_config)
+    try:
+        domains = manager.get_all_domains()
+    except digitalocean.DataReadError:
+        exit_with_error(2,"list: DataReadError, check settings and try again")
+    
+    # Get a list of string objects from domain objects
+    domain_list = []
+    for domain in domains:
+        domain_list.append(domain.name)
+    
+    if terse == True:
+        if domain_list == []:
+            print("")
+            return
+        outline = ",".join(domain_list)
+        print(outline)
+        return
+    
+    #Now print tabled output
+    outline = colors.bold + "Domain Name" + colors.reset
+    print(outline)
+    for domain in domain_list:
+        print(domain)
 
 def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
     '''Creates a single virtual-machine, uses machine_name variable for name,
@@ -997,7 +1028,7 @@ def main():
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
         if option == "help":
-            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, sizes, and money-left. See  --help for more info"
+            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, sizes, domainsm, and money-left. See  --help for more info"
             print(output_line)
         elif option == "machines":
             list_machines(loaded_config,args.terse)
@@ -1013,6 +1044,8 @@ def main():
             list_sizes(loaded_config,args.terse)
         elif option == "money-left":
             list_account_balance(loaded_config,args.terse)
+        elif option == "domains":
+            list_domains(loaded_config,args.terse)
         else:
             exit_with_error(2,"list: Invalid option, see --help for options")
     elif args.command == "spawn":

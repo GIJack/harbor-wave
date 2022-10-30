@@ -255,7 +255,7 @@ def list_machines(loaded_config,terse=False):
             droplet_start_obj = convert_datestamp(droplet.created_at)
             time_running = datetime.now() - droplet_start_obj
             time_running = str(time_running)
-            out_line = droplet.name + "," + droplet.ip_address + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + time_running
+            out_line = droplet.name + "," + str(droplet.ip_address) + "," + droplet.region['slug'] + "," + droplet.size['slug'] + "," + droplet.image['name'] + ',' + time_running
             print(out_line)
     else:
         exit_with_error(10,"list: machines: terse is neither True nor False, should never get here, debug!")

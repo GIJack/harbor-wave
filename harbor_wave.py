@@ -597,7 +597,7 @@ def spawn_machines(loaded_config,N=1):
                     warn("Timeout reached waiting for IP for: " + machine.name)
                 
         tab_space = 20
-        out_line  = colors.bold + "Machine\tIP Address" + colors.reset
+        out_line  = colors.bold + "Machine\tIP Address".expandtabs(tab_space) + colors.reset
         out_line  = out_line.expandtabs(tab_space)
         print(out_line)
         for machine in machine_list:
@@ -1087,7 +1087,7 @@ def main():
             exit_with_error(2,"list: list what? needs an argument, see --help")
         option = args.arguments[0]
         if option == "help":
-            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, sizes, domainsm, and money-left. See  --help for more info"
+            output_line = "list: following are valid list subcommands: machines, templates, regions, ssh-keys, sizes, domains, and money-left. See  --help for more info"
             print(output_line)
         elif option == "machines":
             list_machines(loaded_config,args.terse)

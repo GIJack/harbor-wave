@@ -595,6 +595,7 @@ def spawn_machines(loaded_config,N=1):
                 time.sleep(tick)
                 if timer > timeout:
                     warn("Timeout reached waiting for IP for: " + machine.name)
+                    break
                 
         tab_space = 20
         out_line  = colors.bold + "Machine\tIP Address".expandtabs(tab_space) + colors.reset

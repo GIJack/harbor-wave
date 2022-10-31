@@ -692,9 +692,9 @@ def set_config(config_dir,loaded_config,item,value):
         except:
             exit_with_error(2,"set: invalid value for " + item + ". must by an interger")
     elif item in set_item_bool:
-        if value.lower() == "true":
+        if value.lower() == "true" or value.lower() == "t" or value == 1:
             value = True
-        elif value.lower() == "false":
+        elif value.lower() == "false" or value.lower() == "f" or value == 0:
             value = False
         else:
             exit_with_error(2,"set: invalid value for " + item + ". must be True/False")

@@ -92,24 +92,26 @@ config_help='''
    tag         - tag to use for the droplets that harbor-wave will use to
    recognize its own. Default: harborwave
       
-   base-name - what to call droplets that will be spawned, if more than one
+   base-name   - what to call droplets that will be spawned, if more than one
    is spawned, this will be the base, and new names will be incremented. At
    current this will be numeric. Might change in the future(perhaps name-sets)
    
-   size     - Size code new droplets.  See list sizes for list of size codes and
-   their descriptions. Default: s-1vcpu-1gb.
+   size        - Size code new droplets.  See list sizes for list of size codes
+   and their descriptions. Default: s-1vcpu-1gb.
    
-   template - ID of the custom template image for spawning droplets. You can
+   template    - ID of the custom template image for spawning droplets. You can
    get a list of valid values with list templates
    
    use-dns     - Use fully qualified domain names for droplet host names, and
    set DNS in network settings. True or False. This domain MUST EXIST on your
    Digital Ocean account.
+   
+   wait        - Wait for IP addresses and print them before exiting
 
 '''
 full_help_banner=prog_desc+command_help+config_help
 
-import os,sys
+import os,sys,time
 import argparse
 import json
 import digitalocean
@@ -123,10 +125,11 @@ default_config = {
     "region"       : "nyc1",
     "ssh-key-n"    : 0,
     "tag"          : "harborwave",
-    "base-name" : "",
-    "size"      : "s-1vcpu-1gb",
-    "template"  : "",
-    "use-dns"      : False
+    "base-name"    : "",
+    "size"         : "s-1vcpu-1gb",
+    "template"     : "",
+    "use-dns"      : False,
+    "wait"         : True
 }
 
 class colors:
@@ -504,6 +507,8 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
             return
         droplet_add_string = "do:droplet:" + str(new_vm.id)
         use_project.assign_resource([droplet_add_string])
+    # return VM for use in array later
+    return new_vm
 
 def create_dns(loaded_config,vm_name,ip_address):
     '''Update DNS for new virtual machine, assumes domain is valid, check first'''
@@ -536,7 +541,7 @@ def spawn_machines(loaded_config,N=1):
     
     if loaded_config['use-dns'] == True:
         warn("use-dns is not implemented yet, will be ignored") #TODO, finish domains
-        if check_dns(loaded_config['domain']) == False:
+        if check_dns(loaded_config) == False:
             exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
 
     # Load payload from file, if applicable
@@ -561,23 +566,56 @@ def spawn_machines(loaded_config,N=1):
     # spawn N machines
     fails = 0
     meta_filename = os.path.basename(meta_filename)
+    machine_list = []
     for i in range(N):
         user_meta = { "sequence" : int(i), "base-name":loaded_config['base-name'], "payload":meta_payload, "payload-filename":meta_filename }
         user_meta = json.dumps(user_meta,indent=2)
         vm_name   = loaded_config['base-name'] + str(i)
         msg_line  = vm_name + " created"
         try:
-            create_machine(loaded_config,vm_name,use_key,user_meta)
+            new_machine = create_machine(loaded_config,vm_name,use_key,user_meta)
+            if new_machine != None:
+                machine_list.append(new_machine)
             submsg(msg_line)
         except:
             warn("spawn: could not create machine " + vm_name)
             fails += 1
     
-    if fails >= 1:
-        message("Done, but with " + str(fails) + " failures" )
+    # wait for IP addresses
+    tick    = 1 #period to check for an IP address, measured in seconds
+    timeout = 300 # ticks before we giveup. Generally these take a min before we get an IP. 
+    if loaded_config['wait'] == True and loaded_config['use-dns'] != True and len(machine_list) >= 1:
+        message("Waiting for IP Address(es)...")
+        for machine in machine_list:
+            timer = 0
+            machine = machine.load()
+            while machine.ip_address == None:
+                machine = machine.load()
+                timer  += 1
+                time.sleep(tick)
+                if timer > timeout:
+                    warn("Timeout reached waiting for IP for: " + machine.name)
+                
+        tab_space = 20
+        out_line  = colors.bold + "Machine\tIP Address" + colors.reset
+        out_line  = out_line.expandtabs(tab_space)
+        print(out_line)
+        for machine in machine_list:
+            machine  = machine.load()
+            out_line = machine.name + "\t" + str(machine.ip_address)
+            out_line = out_line.expandtabs(tab_space)
+            print(out_line)
+
+    # Clean up and exit
+    if fails >= 1 and len(machine_list) == 0:
+        message("No Machines spawned, " + str(fails) + " failures" )
+        sys.exit(9)
+    elif fails >=1 and len(machine_list) >= 1:
+        message("Done, but with " + str(fails) + " failures")
         sys.exit(1)
     else:
         message("Done")
+        sys.exit(0)
     
 
 def destroy_machines(loaded_config,args=[]):
@@ -629,36 +667,37 @@ def set_config(config_dir,loaded_config,item,value):
     config_file_name = "harbor-wave.cfg"
     api_file         = config_dir + "/" + api_file_name
     config_file      = config_dir + "/" + config_file_name
-    set_item_str     = ["api-key","domain", "base-name","payload","project","size","region","template", "tag"]
+    set_item_str     = ["api-key","domain", "base-name","payload","project","size","region","template","tag"]
     set_item_int     = ["ssh-key-n"]
-    set_item_bool    = ["use-dns"]
+    set_item_bool    = ["use-dns","wait"]
     all_set_items    = set_item_str + set_item_int + set_item_bool
     
-    ## check if valid
     # Null value check
     if item == None or item == "":
         exit_with_error(2, "set: item name can't be blank")
     # Null set now resets to default
-    elif value == None or value == "":
-        value = default_config[item]
     elif item not in all_set_items:
         exit_with_error(2, "set: " + item + " is not a valid config item, see help config" )
+    elif value == None or value == "":
+        value = default_config[item]
     # Check and set type
     if item in set_item_str:
         try:
             value = str(value)
         except:
-            exit_with_error(2,"set: invalid value for " + item)
+            exit_with_error(2,"set: invalid value for " + item + ". Must resolve to a string")
     elif item in set_item_int:
         try:
             value = int(value)
         except:
-            exit_with_error(2,"set: invalid value for " + item)
+            exit_with_error(2,"set: invalid value for " + item + ". must by an interger")
     elif item in set_item_bool:
-        try:
-            value = bool(value)
-        except:
-            exit_with_error(2,"set: invalid value for " + item)
+        if value.lower() == "true":
+            value = True
+        elif value.lower() == "false":
+            value = False
+        else:
+            exit_with_error(2,"set: invalid value for " + item + ". must be True/False")
 
     # if item is an api key, check before set:
     if item == "api-key":
@@ -974,6 +1013,7 @@ def main():
     config_overrides.add_argument("-s","--size"       ,help="Size code for new VMs",type=str)
     config_overrides.add_argument("-t","--template"   ,help="Image Template for spawning new VMs",type=str)
     config_overrides.add_argument("-u","--use-dns"    ,help="Use FQDNs for naming VMs and add DNS entries in Networking. NOT IMPLEMENNTED YET",action="store_true")
+    config_overrides.add_argument("-w","--no-wait"    ,help="Don't wait for IP address to be assigned, return immediately. Default is to wait",action="store_true")
 
     args = parser.parse_args()
 
@@ -1007,6 +1047,8 @@ def main():
         loaded_config['template']      = args.template
     if args.use_dns == True:
         loaded_config['use-dns']       = True
+    if args.no_wait == True:
+        loaded_config['wait']          = False
 
     # Lets roll. Commands do their own checks
     if args.command == None:

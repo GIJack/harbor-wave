@@ -41,8 +41,9 @@ do.
 See _list templates_ for valid entries
 
 **use-dns**(*bool*) To use FQDNs and create DNS entries for machines spawned.
-**domain** item also needs to be set.
+**domain** item also needs to be set. Defaults to False and not currently
+implemented
 
-default: *False*
+**wait**(*bool*) Wait for, and print IP Addresses of created VMs. Defaults to
+true. This option is implied by **use-dns**
 
-Not currently implemented

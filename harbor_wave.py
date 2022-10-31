@@ -876,7 +876,24 @@ def check_and_print_config(loaded_config,terse=False):
         print(out_line)
         sys.exit(9)
 
-
+def get_domain_obj(loaded_config):
+    '''Take the text entry on domain from config and return domain object'''
+    manager = check_and_connect(loaded_config)
+    # load and check:
+    try:
+        all_domains = manager.get_all_domains()
+    except digitalocean.DataReadError:
+        exit_with_error(2,"list: DataReadError, check settings and try again")
+    domain_name = loaded_config['domain']
+    if domain not in all_domains:
+        exit_with_error(2,domain + " is not a valid domain.")
+    # find the domain
+    domain_object = None
+    for entry in all_domains:
+        if domain_name == entry.name:
+            domain_object = entry
+    # return with selected domain.
+    return domain_object
 
 def print_config(loaded_config,terse=False):
     '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''

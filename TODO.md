@@ -32,3 +32,6 @@ machines.
 in run time or scripting with set vm-base-name
 * use multiple reigons for spawning new machines
 * cloud-init phone-home examples for passing notifications on donnage?
+* Ability to modify application/name space running without stop, i.e. delete/
+respawn specific hosts/rage, grow or shrink the same series. - This requires
+harbor-wave to be stateful, and it is currently stateless tho.

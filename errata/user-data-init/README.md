@@ -24,6 +24,6 @@ HOW TO
 harborwave-runonce.service - put this in your systemd service folder and
 enable it with systemctl.
 
-normal systemd service folder - /usr/local/systemd/system.
+normal systemd service folder - /usr/local/lib/systemd/system.
 
 harborwave\_init\_meta.py - install this as /root/harborwave\_init\_meta.py

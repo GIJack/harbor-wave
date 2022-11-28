@@ -926,14 +926,18 @@ def print_config(loaded_config,terse=False):
 def get_config(loaded_config,item):
     '''prints working config item, takes two options, dict with config items, and item you need'''
     # sensative items we will avoid printing.
-    restricted_list = ['api_key']
-    if item in restricted_list:
-        exit_with_error(2,"get: Won't print " + item + "... ")
+    restricted_list = ['api-key']
     if item not in loaded_config.keys():
         exit_with_error(2,"get: No such config item: " + item + ". See help config")
     
     output = loaded_config[item]
-    output = str(output)
+    if item in restricted_list:
+        if item != "":
+            output = "HIDDEN"
+        else:
+            output = ""
+    else:
+        output = str(output)
     print(output)
 
 def write_config(file_name,config_obj):

@@ -531,21 +531,38 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
     # return VM for use in array later
     return new_vm
 
-def create_subdomain(loaded_config,vm_name,ip_address):
+def create_subdomain(loaded_config,hostname,ip_address):
     '''Update DNS for new virtual machine, assumes domain is valid, check first'''
-
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
     domain_obj  = digitalocean.Domain(token=api_key, name=domain)
-    new_record  = domain_obj.create_new_domain_record(type="A", name=vm_name, data=ip_address)
+    
+    new_record  = domain_obj.create_new_domain_record(type="A", name=hostname, data=ip_address)
     return new_record
+    
+def update_subdomain(loaded_config,hostname,ip_address):
+    '''Update an existing DNS entry, if it previously exists'''
+    api_key     = loaded_config['api-key']
+    domain_name = loaded_config['domain']
+    domain_obj  = digitalocean.Domain(token=api_key, name=domain)
+    
+    updated_record = domain_obj.update_domain_record(type="A", name=hostname, data=ip_address)
+    
+def remove_subdomain(loaded_config,hostname):
+    '''Remove subdomain from DNS. Use with entry'''
+    return False #TODO: Remove before flight
+    api_key     = loaded_config['api-key']
+    domain_name = loaded_config['domain']
+    domain_obj  = digitalocean.Domain(token=api_key, name=domain)
+    
+    #domain_obj.delete_domain_record() #syntax for this?
 
 def spawn_machines(loaded_config,N=1):
     '''the spawn command. takes the config dict and N, int number of machines'''
     
     manager = check_and_connect(loaded_config)
     
-    #Some more checks
+    ## Preflight Checks
     if len(loaded_config["base-name"]) < 1:
         exit_with_error(2,"spawn: base-name needs to be at least one char for this to work!")
     try:
@@ -560,10 +577,8 @@ def spawn_machines(loaded_config,N=1):
     key_n   = loaded_config['ssh-key-n']
     use_key = all_ssh_keys[key_n]
     
-    if loaded_config['use-dns'] == True:
-        warn("use-dns is not implemented yet, will be ignored") #TODO, finish domains
-        if check_dns(loaded_config) == False:
-            exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
+    if loaded_config['use-dns'] == True and check_domain_exists(loaded_config) == False:
+        exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
 
     # Load payload from file, if applicable
     meta_payload  = ""
@@ -602,9 +617,11 @@ def spawn_machines(loaded_config,N=1):
             warn("spawn: could not create machine " + vm_name)
             fails += 1
     
-    ## wait for IP addresses. If not using DNS and waiting for IP addresses
+    ## wait for IP addresses.
     tick    = 1 #period to check for an IP address, measured in seconds
-    timeout = 300 # ticks before we giveup. Generally these take a min before we get an IP. 
+    timeout = 300 # ticks before we giveup. Generally these take a min before we get an IP.
+    tab_space = 20
+    #If not using DNS and waiting for IP addresses
     if loaded_config['wait'] == True and loaded_config['use-dns'] != True and len(machine_list) >= 1:
         message("Waiting for IP Address(es)...")
         for machine in machine_list:
@@ -618,7 +635,6 @@ def spawn_machines(loaded_config,N=1):
                     warn("Timeout reached waiting for IP for: " + machine.name)
                     break
         # Now print IP address table        
-        tab_space = 20
         out_line  = colors.bold + "Machine\tIP Address".expandtabs(tab_space) + colors.reset
         out_line  = out_line.expandtabs(tab_space)
         print(out_line)
@@ -627,6 +643,39 @@ def spawn_machines(loaded_config,N=1):
             out_line = machine.name + "\t" + str(machine.ip_address)
             out_line = out_line.expandtabs(tab_space)
             print(out_line)
+    # Code for adding DNS entries
+    elif loaded_config['use-dns'] == True and len(machine_list) >= 1:
+        message("Waiting for IP Address(es) before adding DNS entries")
+        for machine in machine_list:
+            timer = 0
+            machine = machine.load()
+            while machine.ip_address == None:
+                machine = machine.load()
+                timer  += 1
+                time.sleep(tick)
+                if timer > timeout:
+                    warn("Timeout reached waiting for IP for: " + machine.name)
+                    break
+        # Add DNS. Add new entry if not found, update if found
+        banner_line = colors.bold + "Machine\tDNS\tIP Address" + colors.reset
+        banner_line = banner_line.expandtabs(tab_space)
+        out_lines = []
+        for machine in machine_list:
+            try:
+                if check_subdomain_exists(loaded_config,machine.name) == True:
+                    update_subdomain(loaded_config,machine.name,machine.ip_address)
+                else:
+                    create_subdomain(loaded_config,machine.name,machine.ip_address)
+            except:
+                warn("Could not set DNS for " + machine.name)
+            else:
+                out_line   = machine.name + "\t" + machine.name + "." + loaded_config['domain'] + "\t" + machine.ip_address
+                out_line   = out_line.expandtabs(tab_space)
+                out_lines += out_line
+        # Now print table with DNS entries
+        print(banner_line)
+        for item in out_lines:
+            print(item)
 
     # Clean up and exit
     if fails >= 1 and len(machine_list) == 0:

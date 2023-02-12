@@ -173,7 +173,7 @@ def check_api_key(key):
     # No more tests
     return True
     
-def check_dns(loaded_config):
+def check_domain_exists(loaded_config):
     '''Check if domain is usable for DNS, ignores use-dns, returns True of False'''
     
     manager = check_and_connect(loaded_config)
@@ -185,14 +185,42 @@ def check_dns(loaded_config):
         
     # make a list with just the names
     domain_list = []
-    for item in all_domains:
-        domain_list.append(item.name)
+    for domain in all_domains:
+        domain_list.append(domain.name)
     
     # Check if config lines up with what is on DO
     if loaded_config['domain'] in domain_list:
         return True
     else:
         return False
+        
+def check_subdomain_exists(loaded_config,hostname):
+    '''Check if subdomain exists before trying to create it. A-records only. Hostname must be str'''
+    
+    manager = check_and_connect(loaded_config)
+    
+    try:
+        all_domains = manager.get_all_domains()
+    except digitalocean.DataReadError:
+        exit_with_error(1,"list: DataReadError, check settings and try again")
+
+    # get our domain object, and throw an error if it does not exist
+    domain_object = None
+    for domain in all_domains:
+        if domain.name == loaded_config['domain']:
+            domain_object = domain
+    if domain_object == None:
+        raise AttributeError("Domain in config not set correctly. Check before running this function")
+    
+    # Get all DNS records from Digital Oceaan    
+    domain_records = domain_object.get_records()
+    
+    # Now check if any of these are an A record that matches hostname
+    for item in domain_records:
+        if item.type == "A" and item.name == hostname:
+            return True
+    # If we run through the list and nothing, return false
+    return False
 
 def convert_datestamp(in_date):
     '''takes a string from droplet.createdate, and returns a python datetime object'''
@@ -510,7 +538,7 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
     # return VM for use in array later
     return new_vm
 
-def create_dns(loaded_config,vm_name,ip_address):
+def create_subdomain(loaded_config,vm_name,ip_address):
     '''Update DNS for new virtual machine, assumes domain is valid, check first'''
 
     api_key     = loaded_config['api-key']

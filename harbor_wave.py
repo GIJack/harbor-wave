@@ -197,23 +197,16 @@ def check_domain_exists(loaded_config):
 def check_subdomain_exists(loaded_config,hostname):
     '''Check if subdomain exists before trying to create it. A-records only. Hostname must be str'''
     
-    manager = check_and_connect(loaded_config)
+    # Get domain object
+    api_key     = loaded_config['api-key']
+    domain_name = loaded_config['domain']
+    digitalocean.Domain(token=api_key, name=domain)
     
+    # Get all DNS records for domain from Digital Ocean. Throw an error if domain does not exist
     try:
-        all_domains = manager.get_all_domains()
-    except digitalocean.DataReadError:
-        exit_with_error(1,"list: DataReadError, check settings and try again")
-
-    # get our domain object, and throw an error if it does not exist
-    domain_object = None
-    for domain in all_domains:
-        if domain.name == loaded_config['domain']:
-            domain_object = domain
-    if domain_object == None:
-        raise AttributeError("Domain in config not set correctly. Check before running this function")
-    
-    # Get all DNS records from Digital Oceaan    
-    domain_records = domain_object.get_records()
+        domain_records = domain_object.get_records()
+    except:
+        raise AttributeError("Domain not found on account. Check config before running this function")
     
     # Now check if any of these are an A record that matches hostname
     for item in domain_records:

@@ -630,10 +630,10 @@ def spawn_machines(loaded_config,N=1):
 
     # Clean up and exit
     if fails >= 1 and len(machine_list) == 0:
-        message("No Machines spawned, " + str(fails) + " failures" )
+        message("No Machines spawned, " + str(fails) + " failure(s)" )
         sys.exit(9)
     elif fails >=1 and len(machine_list) >= 1:
-        message("Done, but with " + str(fails) + " failures")
+        message("Done, but with " + str(fails) + " failure(s)")
         sys.exit(1)
     else:
         message("Done")

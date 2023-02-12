@@ -602,7 +602,7 @@ def spawn_machines(loaded_config,N=1):
             warn("spawn: could not create machine " + vm_name)
             fails += 1
     
-    # wait for IP addresses
+    ## wait for IP addresses. If not using DNS and waiting for IP addresses
     tick    = 1 #period to check for an IP address, measured in seconds
     timeout = 300 # ticks before we giveup. Generally these take a min before we get an IP. 
     if loaded_config['wait'] == True and loaded_config['use-dns'] != True and len(machine_list) >= 1:
@@ -617,7 +617,7 @@ def spawn_machines(loaded_config,N=1):
                 if timer > timeout:
                     warn("Timeout reached waiting for IP for: " + machine.name)
                     break
-                
+        # Now print IP address table        
         tab_space = 20
         out_line  = colors.bold + "Machine\tIP Address".expandtabs(tab_space) + colors.reset
         out_line  = out_line.expandtabs(tab_space)

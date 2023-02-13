@@ -1037,7 +1037,7 @@ def check_and_load_config(config_dir):
     
     # check if config directory exists. If not make it:
     if os.path.isdir(config_dir) == False and os.path.exists(config_dir) == True:
-        raise "BadConfDir"
+        raise FileNotFoundError("Config directory not found")
     elif os.path.exists(config_dir) == False:
         os.makedirs(config_dir,mode=0o750,exist_ok=True)
     
@@ -1047,7 +1047,7 @@ def check_and_load_config(config_dir):
     # check if config file exists, if not make it then return defaults:
     # If the config file exists, load it
     if os.path.isfile(config_file)   == False and os.path.exists(config_file) == True:
-        raise "BadConfFile"
+        raise FileNotFoundError("Config file not found")
     elif os.path.exists(config_file) == False:
         write_config(config_file,default_config) #TODO write default_config
         os.chmod(config_file, 0o640)
@@ -1060,7 +1060,7 @@ def check_and_load_config(config_dir):
         loaded_config = json.loads(contents)
     # Double check we've got a loaded config.
     if loaded_config == None:
-        raise "LoadConfigFailed"
+        raise RuntimeError("Loading configuration file failed.")
     # check to make sure all items are present. If not, use defaults
     for item in default_config.keys():
         if item not in loaded_config.keys():
@@ -1074,7 +1074,7 @@ def check_and_load_config(config_dir):
     # If API-key file exists, load API-key
     api_file = config_dir + "/" + api_file_name
     if os.path.isfile(api_file) == False and os.path.exists(api_file) == True:
-        raise "BadAPIFile"
+        raise RuntimeError("Loading API Key file failed")
     elif os.path.exists(api_file) == True:
         try:
             file_obj = open(api_file,"r")            

@@ -578,7 +578,7 @@ def spawn_machines(loaded_config,N=1):
     use_key = all_ssh_keys[key_n]
     
     if loaded_config['use-dns'] == True and check_domain_exists(loaded_config) == False:
-        exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean config, stop!")
+        exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean account, stop!")
 
     # Load payload from file, if applicable
     meta_payload  = ""
@@ -607,6 +607,8 @@ def spawn_machines(loaded_config,N=1):
         user_meta = { "sequence" : int(i), "base-name":loaded_config['base-name'], "payload":meta_payload, "payload-filename":meta_filename }
         user_meta = json.dumps(user_meta,indent=2)
         vm_name   = loaded_config['base-name'] + str(i)
+        if loaded_config['use-dns'] == True:
+            vm_name += "." + loaded_config['domain']
         msg_line  = vm_name + " created"
         try:
             new_machine = create_machine(loaded_config,vm_name,use_key,user_meta)
@@ -657,19 +659,20 @@ def spawn_machines(loaded_config,N=1):
                     warn("Timeout reached waiting for IP for: " + machine.name)
                     break
         # Add DNS. Add new entry if not found, update if found
-        banner_line = colors.bold + "Machine\tDNS\tIP Address" + colors.reset
+        banner_line = colors.bold + "Machine\tIP Address" + colors.reset
         banner_line = banner_line.expandtabs(tab_space)
         out_lines = []
         for machine in machine_list:
+            dns_entry = machine.name.split('.')[0]
             try:
-                if check_subdomain_exists(loaded_config,machine.name) == True:
-                    update_subdomain(loaded_config,machine.name,machine.ip_address)
+                if check_subdomain_exists(loaded_config,dns_entry) == True:
+                    update_subdomain(loaded_config,dns_entry,machine.ip_address)
                 else:
-                    create_subdomain(loaded_config,machine.name,machine.ip_address)
+                    create_subdomain(loaded_config,dns_entry,machine.ip_address)
             except:
                 warn("Could not set DNS for " + machine.name)
             else:
-                out_line   = machine.name + "\t" + machine.name + "." + loaded_config['domain'] + "\t" + machine.ip_address
+                out_line   = machine.name + "\t" + machine.ip_address
                 out_line   = out_line.expandtabs(tab_space)
                 out_lines += out_line
         # Now print table with DNS entries

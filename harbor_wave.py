@@ -566,8 +566,18 @@ def remove_subdomain(loaded_config,hostname):
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
     domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
+    hostname    = hostname.rstrip(domain_name)
     
-    #domain_obj.delete_domain_record() #syntax for this?
+    entry_id       = None
+    domain_entries = domain_obj.get_records()
+    for item in domain_entries:
+        if item.name == hostname:
+            entry_id = item.id
+    if entry_id == None:
+        raise digitalocean.NotFoundError("Remove DNS: Could not find DNS entry")
+
+    domain_obj.delete_domain_record(id=entry_id)
+    return updated_record
 
 def spawn_machines(loaded_config,N=1):
     '''the spawn command. takes the config dict and N, int number of machines'''

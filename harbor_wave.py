@@ -198,9 +198,9 @@ def check_subdomain_exists(loaded_config,hostname):
     '''Check if subdomain exists before trying to create it. A-records only. Hostname must be str'''
     
     # Get domain object
-    api_key     = loaded_config['api-key']
-    domain_name = loaded_config['domain']
-    digitalocean.Domain(token=api_key, name=domain)
+    api_key       = loaded_config['api-key']
+    domain_name   = loaded_config['domain']
+    domain_object = digitalocean.Domain(token=api_key, name=domain_name)
     
     # Get all DNS records for domain from Digital Ocean. Throw an error if domain does not exist
     try:
@@ -535,7 +535,7 @@ def create_subdomain(loaded_config,hostname,ip_address):
     '''Update DNS for new virtual machine, assumes domain is valid, check first'''
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
-    domain_obj  = digitalocean.Domain(token=api_key, name=domain)
+    domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
     
     new_record  = domain_obj.create_new_domain_record(type="A", name=hostname, data=ip_address)
     return new_record
@@ -544,16 +544,25 @@ def update_subdomain(loaded_config,hostname,ip_address):
     '''Update an existing DNS entry, if it previously exists'''
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
-    domain_obj  = digitalocean.Domain(token=api_key, name=domain)
+    domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
+    hostname    = hostname.rstrip(domain_name)
     
-    updated_record = domain_obj.update_domain_record(type="A", name=hostname, data=ip_address)
+    # Get the DO identifier for the record.
+    entry_id       = None
+    domain_entries = domain_obj.get_records()
+    for item in domain_entries:
+        if item.name == hostname:
+            entry_id = item.id
+    
+    updated_record = domain_obj.update_domain_record(id=entry_id, domain=domain_name, data=ip_address)
+    return updated_record
     
 def remove_subdomain(loaded_config,hostname):
     '''Remove subdomain from DNS. Use with entry'''
     return False #TODO: Remove before flight
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
-    domain_obj  = digitalocean.Domain(token=api_key, name=domain)
+    domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
     
     #domain_obj.delete_domain_record() #syntax for this?
 
@@ -664,17 +673,17 @@ def spawn_machines(loaded_config,N=1):
         out_lines = []
         for machine in machine_list:
             dns_entry = machine.name.split('.')[0]
-            try:
-                if check_subdomain_exists(loaded_config,dns_entry) == True:
-                    update_subdomain(loaded_config,dns_entry,machine.ip_address)
-                else:
-                    create_subdomain(loaded_config,dns_entry,machine.ip_address)
-            except:
-                warn("Could not set DNS for " + machine.name)
+            #try:
+            if check_subdomain_exists(loaded_config,dns_entry) == True:
+                update_subdomain(loaded_config,dns_entry,machine.ip_address)
             else:
-                out_line   = machine.name + "\t" + machine.ip_address
-                out_line   = out_line.expandtabs(tab_space)
-                out_lines += out_line
+                create_subdomain(loaded_config,dns_entry,machine.ip_address)
+            #except:
+            #    warn("Could not set DNS for " + machine.name)
+            #else:
+            out_line   = machine.name + "\t" + machine.ip_address
+            out_line   = out_line.expandtabs(tab_space)
+            out_lines.append(out_line)
         # Now print table with DNS entries
         print(banner_line)
         for item in out_lines:

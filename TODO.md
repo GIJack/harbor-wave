@@ -5,9 +5,11 @@ Items to implement
 
 Needed
 ------
-* DNS - implement --use-dns to make machines with FQDN. Big stopper is that IP
-address is not returned from machine creation. It is generally several seconds
-perhaps 1 minuete until IP address is known to the UI. Need new way of doing this
+* DNS - figure out smart method of getting domain and record for each machine
+specified with destroy to remove domains created with spawn, or with ALL, clear
+all harbor-wave domains. harbor-wave is stateless so it can't remember which DNS
+entries it made previously. VMs are tagged so destroy ALL removes all tagged
+machines. Nothing quite like this for DNS
 * Push image template - need way to push template that is local to Digital Ocean. This
 means we need access to a spaces(S3-type bucket), and this is not in the python
 module. this might be added to disk-image-scripts, being that if called from

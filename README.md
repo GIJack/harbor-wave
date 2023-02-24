@@ -1,8 +1,8 @@
 harbor-wave
 =============
 
-STATUS: early-alpha. All commands now implemented. --use-dns switch is not
-implemented yet, everything else should work.
+STATUS: early-alpha. All commands now implemented. --use-dns is half implented.
+It works with spawn, but not destroy
 
 As of such, API, and switches/subcommands are NOT stable yet. Please check them
 after every pull

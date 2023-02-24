@@ -547,16 +547,17 @@ def update_subdomain(loaded_config,hostname,ip_address):
     domain_name = loaded_config['domain']
     domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
     hostname    = hostname.rstrip(domain_name)
-    dns_ttl     = 360 # we set this LOW because this is very dynamic
-    
+        
     # Get the DO identifier for the record.
     entry_id       = None
     domain_entries = domain_obj.get_records()
     for item in domain_entries:
         if item.name == hostname:
             entry_id = item.id
-    
-    updated_record = domain_obj.update_domain_record(id=entry_id, domain=domain_name, data=ip_address, ttl=dns_ttl)
+    if entry_id == None:
+        raise digitalocean.NotFoundError("Update DNS: Could not find DNS entry")
+
+    updated_record = domain_obj.update_domain_record(id=entry_id, domain=domain_name, data=ip_address)
     return updated_record
     
 def remove_subdomain(loaded_config,hostname):

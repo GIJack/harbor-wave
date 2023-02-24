@@ -14,7 +14,7 @@ file, as well as just an arbitrary text string.
 JSON FIELDS
 ------------
 
-harbor-wave data is a JSON array with three fields:
+harbor-wave data is a JSON array with five fields:
 
 **sequence**	- is a number. This is so that a machine can tell where it was in
 the spawn sequence, and if you were to write a swarm/mesh or even multi-machine
@@ -28,6 +28,10 @@ machine.
 
 **base-name**	- the machine has a refrence name of the larger application
 payload. This can be used
+
+**domain**	- DNS domain name passed. Only really useful if \-\-use-dns is
+True. But passes whatever the "domain" config was at time of spawn regardless
+if \-\-use-dns is used
 
 **payload**	- arbitrary data from --payload or the payload setting. This
 can be either a string entered, or the contents of a file specified with FILE:
@@ -43,7 +47,8 @@ a simple query of the API will look something like this.
 curl 169.254.169.254/metadata/v1/user-data
 {
   "sequence": 0,
-  "base-name": "magenta",
+  "base-name": "saphire",
+  "domain": "example.com"
   "payload": "",
   "payload-filename": ""
 }

@@ -88,6 +88,7 @@ def write_environment(data):
     env_file = '/etc/environment'
     out_lines  = "HARBORWAVE_SEQEUNCE=" + str(data['sequence']) + "\n"
     out_lines += "HARBORWAVE_BASENAME=" + data['base-name'] + "\n"
+    out_lines += "HARBORWAVE_DOMAIN="   + data['domain'] + "\n"
     try:
         file_obj = open(env_file,'a')
         file_obj.write(out_lines)

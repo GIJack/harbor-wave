@@ -536,8 +536,9 @@ def create_subdomain(loaded_config,hostname,ip_address):
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
     domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
+    dns_ttl     = 360 # we set this LOW because this is very dynamic
     
-    new_record  = domain_obj.create_new_domain_record(type="A", name=hostname, data=ip_address)
+    new_record  = domain_obj.create_new_domain_record(type="A", name=hostname, data=ip_address, ttl=dns_ttl)
     return new_record
     
 def update_subdomain(loaded_config,hostname,ip_address):
@@ -546,6 +547,7 @@ def update_subdomain(loaded_config,hostname,ip_address):
     domain_name = loaded_config['domain']
     domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
     hostname    = hostname.rstrip(domain_name)
+    dns_ttl     = 360 # we set this LOW because this is very dynamic
     
     # Get the DO identifier for the record.
     entry_id       = None
@@ -554,7 +556,7 @@ def update_subdomain(loaded_config,hostname,ip_address):
         if item.name == hostname:
             entry_id = item.id
     
-    updated_record = domain_obj.update_domain_record(id=entry_id, domain=domain_name, data=ip_address)
+    updated_record = domain_obj.update_domain_record(id=entry_id, domain=domain_name, data=ip_address, ttl=dns_ttl)
     return updated_record
     
 def remove_subdomain(loaded_config,hostname):
@@ -613,7 +615,7 @@ def spawn_machines(loaded_config,N=1):
     meta_filename = os.path.basename(meta_filename)
     machine_list = []
     for i in range(N):
-        user_meta = { "sequence" : int(i), "base-name":loaded_config['base-name'], "payload":meta_payload, "payload-filename":meta_filename }
+        user_meta = { "sequence" : int(i), "base-name":loaded_config['base-name'], "domain":loaded_config['domain'], "payload":meta_payload, "payload-filename":meta_filename }
         user_meta = json.dumps(user_meta,indent=2)
         vm_name   = loaded_config['base-name'] + str(i)
         if loaded_config['use-dns'] == True:

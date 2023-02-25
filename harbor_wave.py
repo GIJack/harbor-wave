@@ -562,7 +562,6 @@ def update_subdomain(loaded_config,hostname,ip_address):
     
 def remove_subdomain(loaded_config,hostname):
     '''Remove subdomain from DNS. Use with entry'''
-    return False #TODO: Remove before flight
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
     domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
@@ -576,8 +575,8 @@ def remove_subdomain(loaded_config,hostname):
     if entry_id == None:
         raise digitalocean.NotFoundError("Remove DNS: Could not find DNS entry")
 
-    domain_obj.delete_domain_record(id=entry_id)
-    return updated_record
+    domain_obj.delete_domain_record(id=entry_id, domain=domain_name)
+    return
 
 def spawn_machines(loaded_config,N=1):
     '''the spawn command. takes the config dict and N, int number of machines'''
@@ -686,17 +685,17 @@ def spawn_machines(loaded_config,N=1):
         out_lines = []
         for machine in machine_list:
             dns_entry = machine.name.split('.')[0]
-            #try:
-            if check_subdomain_exists(loaded_config,dns_entry) == True:
-                update_subdomain(loaded_config,dns_entry,machine.ip_address)
+            try:
+                if check_subdomain_exists(loaded_config,dns_entry) == True:
+                    update_subdomain(loaded_config,dns_entry,machine.ip_address)
+                else:
+                    create_subdomain(loaded_config,dns_entry,machine.ip_address)
+            except:
+                warn("Could not set DNS for " + machine.name)
             else:
-                create_subdomain(loaded_config,dns_entry,machine.ip_address)
-            #except:
-            #    warn("Could not set DNS for " + machine.name)
-            #else:
-            out_line   = machine.name + "\t" + machine.ip_address
-            out_line   = out_line.expandtabs(tab_space)
-            out_lines.append(out_line)
+                out_line   = machine.name + "\t" + machine.ip_address
+                out_line   = out_line.expandtabs(tab_space)
+                out_lines.append(out_line)
         # Now print table with DNS entries
         print(banner_line)
         for item in out_lines:
@@ -751,6 +750,16 @@ def destroy_machines(loaded_config,args=[]):
         except:
             warn("Could not destroy" + item.name)
             fails+=1
+        else:
+            if loaded_config['use-dns'] == True:
+                submsg("[+]-Removing DNS")
+                try:
+                    remove_subdomain(loaded_config,item.name)
+                except digitalocean.NotFoundError:
+                    warn("No DNS for entry:" + item.name)
+                except:
+                    warn("Could not remove DNS entry for " + item.name)
+            
     if fails >= 1:
         message("Done, but with " + fails + " failures")
         sys.exit(1)

@@ -12,12 +12,13 @@ from http.client import responses as http_responses
 from datetime import datetime
 
 config = {
-    'host'      : '169.254.169.254',
-    'path'      : '/metadata/v1/user-data',
-    'timeout'   : 3, # timeout, in seconds, for URL query
-    'logfile'   : "/var/log/harbor-wave-init.log",
-    'app-dir'   : '/opt/harborwave',
-    'done-file' : '/opt/harborwave/done',
+    'host'        : '169.254.169.254',
+    'path'        : '/metadata/v1/user-data',
+    'timeout'     : 3, # timeout, in seconds, for URL query
+    'logfile'     : "/var/log/harbor-wave-init.log",
+    'app-dir'     : '/opt/harborwave',
+    'done-file'   : '/opt/harborwave/done',
+    'needed-keys' : ['sequence', 'base-name', 'payload', 'payload-filename'],
 }
 
 def message(message):
@@ -71,10 +72,9 @@ def get_data(config):
         exit_with_error(9,"Data isn't in the JSON format, are you sure this is a harbor-wave VM?")
     
     # check to make sure all fields are there
-    needed_keys = ['sequence', 'base-name', 'payload','payload-filename']
     data_keys = output_data.keys()
     missing_keys = []
-    for item in needed_keys:
+    for item in config['needed-keys']:
         if item not in data_keys:
             missing_keys.appennd(item)
     if missing_keys != []:

@@ -128,7 +128,7 @@ default_config = {
     "base-name"    : "",
     "size"         : "s-1vcpu-1gb",
     "template"     : "",
-    "use-dns"      : False,
+    #"use-dns"      : False,
     "wait"         : True
 }
 
@@ -598,7 +598,7 @@ def spawn_machines(loaded_config,N=1):
     key_n   = loaded_config['ssh-key-n']
     use_key = all_ssh_keys[key_n]
     
-    if loaded_config['use-dns'] == True and check_domain_exists(loaded_config) == False:
+    if loaded_config['domain'] != "" and check_domain_exists(loaded_config) == False:
         exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean account, stop!")
 
     # Load payload from file, if applicable
@@ -774,7 +774,7 @@ def set_config(config_dir,loaded_config,item,value):
     config_file      = config_dir + "/" + config_file_name
     set_item_str     = ["api-key","domain", "base-name","payload","project","size","region","template","tag"]
     set_item_int     = ["ssh-key-n"]
-    set_item_bool    = ["use-dns","wait"]
+    set_item_bool    = ["wait"]
     all_set_items    = set_item_str + set_item_int + set_item_bool
     
     # Null value check
@@ -1117,6 +1117,9 @@ def check_and_load_config(config_dir):
             warn("could not read API key from api-key file, check permissions")
     else:
         loaded_config['api-key'] = None
+        
+    # use-dns defaults to False, if 'domain' is specified, then it gets changed to true, later.
+    loaded_config['use-dns'] = False
     
     return loaded_config
 
@@ -1129,7 +1132,7 @@ def main():
 
     config_overrides = parser.add_argument_group("Config Overrides","Configuration Overrides, lower case")
     config_overrides.add_argument("-a","--api-key"    ,help="Digitial Ocean API key to use",type=str)
-    config_overrides.add_argument("-d","--domain"     ,help="Domain to use if --use-dns is used.",type=str)
+    config_overrides.add_argument("-d","--domain"     ,help="Domain. If this is set, the machines are given a FQDN using this domain. NOTE: THis domain must be added to DO account. available domains can be checked with list",type=str)
     config_overrides.add_argument("-g","--tag"        ,help="DO tag to use on VMs so harbor-wave can identify its VMs. default: harborwave",type=str)
     config_overrides.add_argument("-k","--ssh-key-n"  ,help="Interger: index of SSH-key to use for root(or other if so configed) access. Default is 0",type=int)
     config_overrides.add_argument("-l","--payload"    ,help="Aribtrary content that gets sent to every spawned machine via user-data in API. if FILE: is specified, local file is read and used as a payload as a string",type=str)
@@ -1138,7 +1141,6 @@ def main():
     config_overrides.add_argument("-r","--region"     ,help="Region code. Specify what datacenter this goes in",type=str)
     config_overrides.add_argument("-s","--size"       ,help="Size code for new VMs",type=str)
     config_overrides.add_argument("-t","--template"   ,help="Image Template for spawning new VMs",type=str)
-    config_overrides.add_argument("-u","--use-dns"    ,help="Use FQDNs for naming VMs and add DNS entries in Networking. NOT IMPLEMENNTED YET",action="store_true")
     config_overrides.add_argument("-w","--no-wait"    ,help="Don't wait for IP address to be assigned, return immediately. Default is to wait",action="store_true")
 
     args = parser.parse_args()
@@ -1171,10 +1173,11 @@ def main():
         loaded_config['size']          = args.size
     if args.template != None:
         loaded_config['template']      = args.template
-    if args.use_dns == True:
-        loaded_config['use-dns']       = True
     if args.no_wait == True:
         loaded_config['wait']          = False
+    # Now check if we are using a domain, once all options haave been merged replaces --use-dns
+    if loaded_config['domain'] != "":
+        loaded_config['use-dns']       = True
 
     # Lets roll. Commands do their own checks
     if args.command == None:

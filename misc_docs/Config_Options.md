@@ -40,10 +40,12 @@ do.
 **template**(*string*) ID of template for creating new machines with spawn.
 See _list templates_ for valid entries
 
-**use-dns**(*bool*) To use FQDNs and create DNS entries for machines spawned.
-**domain** item also needs to be set. Defaults to False and not currently
-implemented
+**domain**(*string*) Use FQDNs. If this is set, then hostnames are generated
+using FQDNs, with _domain_ as the domain, and the hostname as subdomain. A DNS
+A-record is added in Digital ocean. you need a DNS Domain added to your Digital
+Ocean account for his to work. you can check domains available with
+_list domains_
 
-**wait**(*bool*) Wait for, and print IP Addresses of created VMs. Defaults to
-true. This option is implied by **use-dns**
+**wait**(*bool*) Wait for, and print IP Addresses of created VMs. If a FQDN is
+used, then harbor-wave will always wait for the IP to create the DNS Record
 

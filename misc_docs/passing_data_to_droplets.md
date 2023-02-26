@@ -29,9 +29,7 @@ machine.
 **base-name**	- the machine has a refrence name of the larger application
 payload. This can be used
 
-**domain**	- DNS domain name passed. Only really useful if \-\-use-dns is
-True. But passes whatever the "domain" config was at time of spawn regardless
-if \-\-use-dns is used
+**domain**	- DNS domain name used on command line
 
 **payload**	- arbitrary data from --payload or the payload setting. This
 can be either a string entered, or the contents of a file specified with FILE:

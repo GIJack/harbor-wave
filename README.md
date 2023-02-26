@@ -132,9 +132,9 @@ https://docs.digitalocean.com/products/droplets/how-to/provide-user-data/
 
 there are five keys:
 
-sequence: Interger, sequence number of the machine spawned
-base-name: base name of the hostname
-domain: Domain name if --domain is used.
-payload: arbitrary string from config or command line, that allows input data
+*sequence: Interger, sequence number of the machine spawned
+*base-name: base name of the hostname
+*domain: Domain name if --domain is used.
+*payload: arbitrary string from config or command line, that allows input data
 to be given to the machines at spawn time
-payload-file: if payload is from a file using FILE:, the name of this file.
+*payload-file: if payload is from a file using FILE:, the name of this file.

@@ -74,7 +74,9 @@ config_help='''
    is the only option that does NOT go in the .cfg file, but rather the seperate
    api-key file
 
-   domain      - DNS domain to use if use-dns is set True
+   domain      - DNS domain. If this is set, then harbor-wave creates a VM with
+   a FQDN based on this domain. a DNS A-Record is created for the droplet. Must
+   have a domain associated with digital ocean account
    
    payload     - Input data from your local machine and made availble over the
    Digital Ocean API, for use with cloud-init or other. This is a string
@@ -101,10 +103,6 @@ config_help='''
    
    template    - ID of the custom template image for spawning droplets. You can
    get a list of valid values with list templates
-   
-   use-dns     - Use fully qualified domain names for droplet host names, and
-   set DNS in network settings. True or False. This domain MUST EXIST on your
-   Digital Ocean account.
    
    wait        - Wait for IP addresses and print them before exiting
 

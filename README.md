@@ -78,8 +78,12 @@ SSH key index, is a count-from-0 index, you can see available keys with
 ```
 harbor-wave list ssh-keys
 ```
+Five
+-----
+Use Harbor wave
 
-you are ready to start spawning VMs with
+Spin up VMs with spawn. N is a number, you can spawn as many as digital ocean
+will let you. These will all be the same VM.
 
 ```
 harbor-wave spawn <N>
@@ -126,10 +130,11 @@ Machines spun up with harbor wave have a JSON array in DO's user data for
 cloud-init.
 https://docs.digitalocean.com/products/droplets/how-to/provide-user-data/
 
-there are three keys:
+there are five keys:
 
 sequence: Interger, sequence number of the machine spawned
 base-name: base name of the hostname
+domain: Domain name if --domain is used.
 payload: arbitrary string from config or command line, that allows input data
 to be given to the machines at spawn time
 payload-file: if payload is from a file using FILE:, the name of this file.

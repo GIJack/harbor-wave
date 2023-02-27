@@ -19,9 +19,6 @@ Brainstorming
 * Instance stops certain date-time
 * Instance runs until X job is complete, does Y task to send data back to user
 and then terminates the instance
-* think of, and codify user_data metadata format. so far we have sequence=N.
-Perhaps we want to add more stuff, such as parameters from config with set
-or switch on the command line. payload?
 * use grouping of machines by name in list machines. perhaps an option for only
 listing the base names, or first machine in a series, and then count of total
 machines.

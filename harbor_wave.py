@@ -623,7 +623,14 @@ def spawn_machines(loaded_config,N=1):
     meta_filename = os.path.basename(meta_filename)
     machine_list = []
     for i in range(N):
-        user_meta = { "sequence" : int(i), "base-name":loaded_config['base-name'], "domain":loaded_config['domain'], "payload":meta_payload, "payload-filename":meta_filename }
+        user_meta = { 
+        "sequence" : int(i),
+        "total_vms": int(N),
+        "base-name":loaded_config['base-name'],
+        "domain":loaded_config['domain'],
+        "payload":meta_payload,
+        "payload-filename":meta_filename,
+        }
         user_meta = json.dumps(user_meta,indent=2)
         vm_name   = loaded_config['base-name'] + str(i)
         if loaded_config['use-dns'] == True:

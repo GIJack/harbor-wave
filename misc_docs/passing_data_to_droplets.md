@@ -16,7 +16,7 @@ JSON FIELDS
 
 harbor-wave data is a JSON array with five fields:
 
-**sequence**	- is a number. This is so that a machine can tell where it was in
+**sequence**	- interger. This is so that a machine can tell where it was in
 the spawn sequence, and if you were to write a swarm/mesh or even multi-machine
 environment, the machine can use this number to determine its role, and identify
 itself to other machines, and for multi-role machines with the same programming
@@ -25,6 +25,8 @@ can determine their role based on the sequence.
 A big example,  is making sequence 0 the head machine, as it is guarunteed to
 be there, and for whatever hub or cordinating data can be safely done by this
 machine.
+
+**total_vms**	- interger. This is the total amount of machines in the sequence.
 
 **base-name**	- the machine has a refrence name of the larger application
 payload. This can be used

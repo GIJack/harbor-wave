@@ -87,6 +87,7 @@ def write_environment(data):
     '''Add sequence and base-name to /etc/environment.'''
     env_file = '/etc/environment'
     out_lines  = "HARBORWAVE_SEQEUNCE=" + str(data['sequence']) + "\n"
+    out_lines += "HARBORWAVE_TOTAL_VMS=" + str(data['total_vms']) + "\n"
     out_lines += "HARBORWAVE_BASENAME=" + data['base-name'] + "\n"
     out_lines += "HARBORWAVE_DOMAIN="   + data['domain'] + "\n"
     try:

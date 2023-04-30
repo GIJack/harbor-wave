@@ -544,11 +544,11 @@ def update_subdomain(loaded_config,hostname,ip_address):
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
     domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
-    hostname    = hostname.rstrip(domain_name)
         
     # Get the DO identifier for the record.
     entry_id       = None
     domain_entries = domain_obj.get_records()
+    
     for item in domain_entries:
         if item.name == hostname:
             entry_id = item.id
@@ -563,8 +563,7 @@ def remove_subdomain(loaded_config,hostname):
     api_key     = loaded_config['api-key']
     domain_name = loaded_config['domain']
     domain_obj  = digitalocean.Domain(token=api_key, name=domain_name)
-    hostname    = hostname.rstrip(domain_name)
-    
+    hostname    = hostname.split(".")[0]
     entry_id       = None
     domain_entries = domain_obj.get_records()
     for item in domain_entries:
@@ -632,7 +631,13 @@ def spawn_machines(loaded_config,N=1):
         "payload-filename":meta_filename,
         }
         user_meta = json.dumps(user_meta,indent=2)
-        vm_name   = loaded_config['base-name'] + str(i)
+        # If there is only one machine in sequence, then don't add a number
+        # This is so you can use some whacky vhosts
+        if N == 1:
+            vm_name   = loaded_config['base-name']
+        else:
+            vm_name   = loaded_config['base-name'] + str(i)
+            
         if loaded_config['use-dns'] == True:
             vm_name += "." + loaded_config['domain']
         msg_line  = vm_name + " created"
@@ -754,7 +759,7 @@ def destroy_machines(loaded_config,args=[]):
             submsg(item.name + " destroyed")
         except:
             warn("Could not destroy" + item.name)
-            fails+=1
+            fails += 1
         else:
             if loaded_config['use-dns'] == True:
                 submsg("[+]-Removing DNS")
@@ -762,11 +767,13 @@ def destroy_machines(loaded_config,args=[]):
                     remove_subdomain(loaded_config,item.name)
                 except digitalocean.NotFoundError:
                     warn("No DNS for entry:" + item.name)
+                    fails += 1
                 except:
                     warn("Could not remove DNS entry for " + item.name)
+                    fails += 1
             
     if fails >= 1:
-        message("Done, but with " + fails + " failures")
+        message("Done, but with " + str(fails) + " failures")
         sys.exit(1)
     else:
         message("Done")

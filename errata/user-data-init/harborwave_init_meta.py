@@ -18,7 +18,7 @@ config = {
     'logfile'     : "/var/log/harbor-wave-init.log",
     'app-dir'     : '/opt/harborwave',
     'done-file'   : '/opt/harborwave/done',
-    'needed-keys' : ['sequence', 'base-name', 'payload', 'payload-filename'],
+    'needed-keys' : ['sequence', 'base-name', 'payload', 'payload-filename','domain','total_vms'],
 }
 
 def message(message):

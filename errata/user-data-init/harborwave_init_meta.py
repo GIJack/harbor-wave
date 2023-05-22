@@ -78,18 +78,18 @@ def get_data(config):
         if item not in data_keys:
             missing_keys.appennd(item)
     if missing_keys != []:
-        missing_keys = " ".join(missing_keys)
-        exit_with_error(9,"Missing JSON items, are you sure this is a harbor-wave VM?")
+        missing_keys = ",".join(missing_keys)
+        exit_with_error(9,"Missing JSON items" + missing keys + ": are you sure this is a harbor-wave VM?")
     
     return output_data
 
 def write_environment(data):
     '''Add sequence and base-name to /etc/environment.'''
     env_file = '/etc/environment'
-    out_lines  = "HARBORWAVE_SEQEUNCE=" + str(data['sequence']) + "\n"
+    out_lines  = "HARBORWAVE_SEQEUNCE="  + str(data['sequence']) + "\n"
     out_lines += "HARBORWAVE_TOTAL_VMS=" + str(data['total_vms']) + "\n"
-    out_lines += "HARBORWAVE_BASENAME=" + data['base-name'] + "\n"
-    out_lines += "HARBORWAVE_DOMAIN="   + data['domain'] + "\n"
+    out_lines += "HARBORWAVE_BASENAME="  + data['base-name'] + "\n"
+    out_lines += "HARBORWAVE_DOMAIN="    + data['domain'] + "\n"
     try:
         file_obj = open(env_file,'a')
         file_obj.write(out_lines)

@@ -2,17 +2,16 @@ harbor-wave
 =============
 
 STATUS: Alpha. All commands and all switches implemented. Tested a little bit
-to work under nominal conditions. Extensive testing has not been done. As of
-such, API, and switches/subcommands are NOT stable yet. Please check them after
-every pull
+to work under nominal conditions. Extensive testing has not been done.
 
 NOTE: REPORT ALL BUGS. ISSUE TRACKER IS ENABLED AND AWAITING YOUR REPORT
 
-Harbor Wave is a Utility for the Digital Ocean(https://digitalocean.com), cloud
-service, to deploy temporary applications using droplets based on custom
-templates. While using multiple machines, it is possible to deploy an
-application as a swarm of droplets, each with a unique sequence number. You can
-do this simply by specifying the amount of droplets with the spawn command.
+Harbor Wave is an automation utility for the Digital Ocean(https://digitalocean.com),
+cloud service. You can now write basic applications that run both native and
+cloud.
+
+It is for deploying temporary and ephemerial droplets based on custom templates,
+that have been previously been uploaded and compiled.
 
 Communication and interaction between droplets is up to the application in
 the template, but can be facilitated via the private networking between droplets
@@ -23,6 +22,9 @@ Based on a digital Ocean API python lib: https://github.com/koalalorenzo/python-
 This is designed as part of an application stack with Disk-Image-Scripts, which
 is to generate custom template images:
 https://github.com/GIJack/disk-image-scripts
+
+Some example templates:
+https://github.com/GIJack/cloud-image-templates
 
 
 Steps

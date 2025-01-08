@@ -154,9 +154,12 @@ def warn(message):
 
 def check_api_key(key):
     '''checks if API key is valid format. returns True/False. Takes one parameter, the key'''
-    # a DO access key is 64 characters long, hexidecimal
+    # a DO access key is 64 characters long, hexidecimal, new format has
+    # meta headers before the hexdec
     key_len = 64
     base    = 16
+    # Strip headers, if present
+    key = key.split('_')[-1]
     # Key is a string
     if type(key) != str:
         return False

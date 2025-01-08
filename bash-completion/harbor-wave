@@ -5,7 +5,7 @@ _harborwave_completion(){
   local base_commands="spawn destroy list get set help print-config touch check-config"
   local help_topics="config commands"
   local list_commands="machines templates regions ssh-keys sizes domains money-left"
-  local config_items="api_key domain region ssh-key-n tag base-name size template wait"
+  local config_items="api-key domain region ssh-key-n tag base-name size template wait"
   cur=${COMP_WORDS[COMP_CWORD]}
   prev=${COMP_WORDS[COMP_CWORD-1]}
 

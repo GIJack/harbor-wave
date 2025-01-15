@@ -620,7 +620,8 @@ def spawn_machines(loaded_config,N=1,terse=False):
         meta_payload = loaded_config['payload']
     
     banner = "Spawning machine series: %s, %s machines(s)" % (loaded_config['base-name'],str(n))
-    message(banner)
+    if terse == False:
+        message(banner)
     # spawn N machines
     fails = 0
     meta_filename = os.path.basename(meta_filename)

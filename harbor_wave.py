@@ -650,7 +650,8 @@ def spawn_machines(loaded_config,N=1,terse=False):
             new_machine = create_machine(loaded_config,vm_name,use_key,user_meta)
             if new_machine != None:
                 machine_list.append(new_machine)
-            submsg(msg_line)
+            if terse == False:
+                submsg(msg_line)
         except:
             warn("spawn: could not create machine " + vm_name)
             fails += 1

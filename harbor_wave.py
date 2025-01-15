@@ -1285,9 +1285,9 @@ def main():
     elif args.command == "spawn":
         if len(args.arguments) >= 1:
             N = args.arguments[0]
-            spawn_machines(loaded_config,N)
+            spawn_machines(loaded_config,N,terse=args.terse)
         else:
-            spawn_machines(loaded_config)
+            spawn_machines(loaded_config,terse=args.terse)
     elif args.command == "destroy":
         if len(args.arguments) >= 1:
             options = args.arguments

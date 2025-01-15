@@ -619,7 +619,7 @@ def spawn_machines(loaded_config,N=1):
     else:
         meta_payload = loaded_config['payload']
     
-    banner = "Spawning machine series: " + loaded_config['base-name'] + ", " + str(N) + " machines(s)"
+    banner = "Spawning machine series: %s, %s machines(s)" % (loaded_config['base-name'],str(n))
     message(banner)
     # spawn N machines
     fails = 0

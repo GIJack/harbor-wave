@@ -578,7 +578,7 @@ def remove_subdomain(loaded_config,hostname):
     domain_obj.delete_domain_record(id=entry_id, domain=domain_name)
     return
 
-def spawn_machines(loaded_config,N=1):
+def spawn_machines(loaded_config,N=1,terse=False):
     '''the spawn command. takes the config dict and N, int number of machines'''
     
     manager = check_and_connect(loaded_config)

@@ -599,7 +599,7 @@ def spawn_machines(loaded_config,N=1):
     use_key = all_ssh_keys[key_n]
     
     if loaded_config['domain'] != "" and check_domain_exists(loaded_config) == False:
-        exit_with_error(9,"spawn: use-dns is True, but domain name is not in Digital Ocean account, stop!")
+        exit_with_error(9,"spawn: domain is set, but domain name is not in Digital Ocean account, stop!")
 
     # Load payload from file, if applicable
     meta_payload  = ""

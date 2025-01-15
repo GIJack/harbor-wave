@@ -614,7 +614,8 @@ def spawn_machines(loaded_config,N=1):
             file_obj.close()
             meta_payload = file_data
         except:
-            exit_with_error(2,"spawn: could not read payload from " + meta_filename + ". Please ensure this file exists and read permissions are set")
+            error_line = "spawn: could not read payload from %s. Please ensure this file exists and read permissions are set" % (meta_filename)
+            exit_with_error(2,error_line)
     else:
         meta_payload = loaded_config['payload']
     

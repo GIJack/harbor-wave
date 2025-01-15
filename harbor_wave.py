@@ -677,15 +677,28 @@ def spawn_machines(loaded_config,N=1,terse=False):
         # Now print IP address table        
         out_line  = colors.bold + "Machine\tIP Address".expandtabs(tab_space) + colors.reset
         out_line  = out_line.expandtabs(tab_space)
-        print(out_line)
+        ip_list   = []
+        if terse == False:
+            print(out_line)
         for machine in machine_list:
             machine  = machine.load()
             out_line = machine.name + "\t" + str(machine.ip_address)
             out_line = out_line.expandtabs(tab_space)
-            print(out_line)
+            if terse == False:
+                print(out_line)
+            elif terse == True:
+                ip_list.append(machine.ip_address)
+            else:
+                warn("spawn: ip addresses: terse is neither True nor False, should not be here, debug")
+        #Terse print, which is going to be CSV output
+        terse_output = ",".join(ip_list)
+        if terse == True and len(ip_list) >= 1:
+            print(terse_output)
+
     # Code for adding DNS entries
     elif loaded_config['use-dns'] == True and len(machine_list) >= 1:
-        message("Waiting for IP Address(es) before adding DNS entries")
+        if terse == False:
+            message("Waiting for IP Address(es) before adding DNS entries")
         for machine in machine_list:
             timer = 0
             machine = machine.load()
@@ -710,25 +723,39 @@ def spawn_machines(loaded_config,N=1,terse=False):
             except:
                 warn("Could not set DNS for " + machine.name)
             else:
-                out_line   = machine.name + "\t" + machine.ip_address
-                out_line   = out_line.expandtabs(tab_space)
+                if terse == False:
+                    out_line   = machine.name + "\t" + machine.ip_address
+                    out_line   = out_line.expandtabs(tab_space)
+                elif terse == True:
+                    out_line   = "%s:%s" % (machine.name,machine.ip_address)
+                else:
+                    warn("spawn: gen dns table: terse neither True nor False, should not be! Debug!")
+                    continue
                 out_lines.append(out_line)
         # Now print table with DNS entries
-        print(banner_line)
-        for item in out_lines:
-            print(item)
+        if terse == False:
+            print(banner_line)
+            for item in out_lines:
+                print(item)
+        elif terse == True:
+            output = ",".join(out_lines)
+            print(output)
+        else:
+            warn("spawn: print dns ip table: terse neither True nor False, should not be! Debug!")
 
     # Clean up and exit
     if fails >= 1 and len(machine_list) == 0:
-        message("No Machines spawned, " + str(fails) + " failure(s)" )
+        if terse == False:
+            message("No Machines spawned, " + str(fails) + " failure(s)" )
         sys.exit(9)
     elif fails >=1 and len(machine_list) >= 1:
-        message("Done, but with " + str(fails) + " failure(s)")
+        if terse == False:
+            message("Done, but with " + str(fails) + " failure(s)")
         sys.exit(1)
     else:
-        message("Done")
+        if terse == False:
+            message("Done")
         sys.exit(0)
-    
 
 def destroy_machines(loaded_config,args=[]):
     '''delete virtual machine(s). Deletes machines specified by a list

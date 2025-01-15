@@ -662,7 +662,8 @@ def spawn_machines(loaded_config,N=1,terse=False):
     tab_space = 20
     #If not using DNS and waiting for IP addresses
     if loaded_config['wait'] == True and loaded_config['use-dns'] != True and len(machine_list) >= 1:
-        message("Waiting for IP Address(es)...")
+        if terse == False:
+            message("Waiting for IP Address(es)...")
         for machine in machine_list:
             timer = 0
             machine = machine.load()

@@ -517,7 +517,6 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
                                     backups=False )
     new_vm.create()
     
-    return #DEBUG to test if project code is correct
     #Add to project
     if loaded_config['project'] != None and loaded_config['project'] != "":
         use_project = None
@@ -530,7 +529,11 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
             warn("spawn: could not add " + machine_name + " to non-existant project: " + loaded_config['project'] + ", skipping")
             return
         droplet_add_string = "do:droplet:" + str(new_vm.id)
-        use_project.assign_resource([droplet_add_string])
+        try:
+            use_project.assign_resource([droplet_add_string])
+        except:
+            warn_line = "Could not add %s to project %s. Check perms on API Key" %(machine_name,loaded_config['project'])
+            warn(warn_line)
     # return VM for use in array later
     return new_vm
 
@@ -654,7 +657,7 @@ def spawn_machines(loaded_config,N=1,terse=False):
                 machine_list.append(new_machine)
             if terse == False:
                 submsg(msg_line)
-        except:
+        except: #DEBUG
             warn("spawn: could not create machine " + vm_name)
             fails += 1
     

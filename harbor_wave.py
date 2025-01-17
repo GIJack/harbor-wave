@@ -692,7 +692,8 @@ def spawn_machines(loaded_config,N=1,terse=False):
             if terse == False:
                 print(out_line)
             elif terse == True:
-                ip_list.append(machine.ip_address)
+                item = "%s:%s" % (machine.name,machine.ip_address)
+                ip_list.append(item)
             else:
                 warn("spawn: ip addresses: terse is neither True nor False, should not be here, debug")
         #Terse print, which is going to be CSV output
@@ -1176,7 +1177,7 @@ def main():
     parser.add_argument("command", nargs="?"    ,help="See above for description of commands")
     parser.add_argument("arguments", nargs="*"  ,help="Arguments for command, see above")
     parser.add_argument("-?","--help"           ,help="Show This Help Message", action="help")
-    parser.add_argument("-T","--terse"          ,help="when using list or print-config, print CSV format instead of justified tab tables. For spawn, prints just IP addresses of machines spawned in comma seperated list. if DNS is used, then DNS:IP pairs, seperated by commas",action="store_true")
+    parser.add_argument("-T","--terse"          ,help="when using list or print-config, print CSV format instead of justified tab tables. For spawn, prints a NAME:IP pair seperated by commas",action="store_true")
 
     config_overrides = parser.add_argument_group("Config Overrides","Configuration Overrides, lower case")
     config_overrides.add_argument("-a","--api-key"    ,help="Digitial Ocean API key to use",type=str)

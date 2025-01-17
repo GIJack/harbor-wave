@@ -126,7 +126,6 @@ default_config = {
     "base-name"    : "",
     "size"         : "s-1vcpu-1gb",
     "template"     : "",
-    #"use-dns"      : False,
     "wait"         : True
 }
 
@@ -175,7 +174,7 @@ def check_api_key(key):
     return True
     
 def check_domain_exists(loaded_config):
-    '''Check if domain is usable for DNS, ignores use-dns, returns True of False'''
+    '''Check if domain is usable for DNS returns True of False'''
     
     manager = check_and_connect(loaded_config)
     
@@ -237,7 +236,7 @@ def check_and_connect(loaded_config):
     '''give the loaded config, check the API key, and return a DO manager session'''
     
     # check to make sure we have the right config options
-    needed_keys = ("api-key","domain","region","ssh-key-n","base-name","size","template","use-dns")
+    needed_keys = ("api-key","domain","region","ssh-key-n","base-name","size","template")
     for key in needed_keys:
         if key not in loaded_config.keys():
             exit_with_error(2,key + " not set. see help config")
@@ -518,6 +517,8 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
                                     backups=False )
     new_vm.create()
     
+    return #DEBUG to test if project code is correct
+    #Add to project
     if loaded_config['project'] != None and loaded_config['project'] != "":
         use_project = None
         projects = manager.get_all_projects()
@@ -525,6 +526,7 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
             if item.name == loaded_config['project']:
                 use_project = item
         if use_project == None:
+            warn_line = "spawn: could not add " + machine_name + " to non-existant project: " + loaded_config['project'] + ", skipping"
             warn("spawn: could not add " + machine_name + " to non-existant project: " + loaded_config['project'] + ", skipping")
             return
         droplet_add_string = "do:droplet:" + str(new_vm.id)
@@ -643,7 +645,7 @@ def spawn_machines(loaded_config,N=1,terse=False):
         else:
             vm_name   = loaded_config['base-name'] + str(i)
             
-        if loaded_config['use-dns'] == True:
+        if loaded_config['domain'] != '':
             vm_name += "." + loaded_config['domain']
         msg_line  = vm_name + " created"
         try:
@@ -661,7 +663,7 @@ def spawn_machines(loaded_config,N=1,terse=False):
     timeout = 300 # ticks before we giveup. Generally these take a min before we get an IP.
     tab_space = 20
     #If not using DNS and waiting for IP addresses
-    if loaded_config['wait'] == True and loaded_config['use-dns'] != True and len(machine_list) >= 1:
+    if loaded_config['wait'] == True and loaded_config['domain'] == "" and len(machine_list) >= 1:
         if terse == False:
             message("Waiting for IP Address(es)...")
         for machine in machine_list:
@@ -696,7 +698,7 @@ def spawn_machines(loaded_config,N=1,terse=False):
             print(terse_output)
 
     # Code for adding DNS entries
-    elif loaded_config['use-dns'] == True and len(machine_list) >= 1:
+    elif loaded_config['domain'] != "" and len(machine_list) >= 1:
         if terse == False:
             message("Waiting for IP Address(es) before adding DNS entries")
         for machine in machine_list:
@@ -795,7 +797,7 @@ def destroy_machines(loaded_config,args=[]):
             warn("Could not destroy" + item.name)
             fails += 1
         else:
-            if loaded_config['use-dns'] == True:
+            if loaded_config['domain'] != '':
                 submsg("[+]-Removing DNS")
                 try:
                     remove_subdomain(loaded_config,item.name)
@@ -1008,8 +1010,8 @@ def check_and_print_config(loaded_config,terse=False):
     out_line = "Domain:\t".expandtabs(tab_space)
     for domain in domains:
         domain_list.append(domain.name)
-    if loaded_config['use-dns'] != True:
-        out_line += "use-dns set to False, skipping"
+    if loaded_config['domain'] == '':
+        out_line += "no domain, skipping"
     elif loaded_config['domain'] in domain_list:
         out_line += OK
     else:
@@ -1163,10 +1165,7 @@ def check_and_load_config(config_dir):
             warn("could not read API key from api-key file, check permissions")
     else:
         loaded_config['api-key'] = None
-        
-    # use-dns defaults to False, if 'domain' is specified, then it gets changed to true, later.
-    loaded_config['use-dns'] = False
-    
+
     return loaded_config
 
 def main():
@@ -1193,10 +1192,10 @@ def main():
 
     # get config from file
     config_dir = os.getenv("HOME") + "/.config/harbor-wave/"
-    try:
-        loaded_config = check_and_load_config(config_dir)
-    except:
-        warn("could not load config, all options must be specified on command line or harbor-wave will fail")
+    #try:
+    loaded_config = check_and_load_config(config_dir)
+    #except:
+    #    warn("could not load config, all options must be specified on command line or harbor-wave will fail")
     
     # Now apply command line switch options
     if args.api_key != None:
@@ -1222,7 +1221,7 @@ def main():
     if args.no_wait == True:
         loaded_config['wait']          = False
     # Now check if we are using a domain, once all options haave been merged replaces --use-dns
-    if loaded_config['domain'] != "":
+    if loaded_config['domain']   !=  "":
         loaded_config['use-dns']       = True
 
     # Lets roll. Commands do their own checks

@@ -763,7 +763,7 @@ def spawn_machines(loaded_config,N=1,terse=False):
             message("Done")
         sys.exit(0)
 
-def destroy_machines(loaded_config,args=[]):
+def destroy_machines(loaded_config,args=[],terse=False):
     '''delete virtual machine(s). Deletes machines specified by a list
     of matching machine names. If ALL is specified instead of a list
     all machines with the configured tag will be deleted'''
@@ -779,7 +779,7 @@ def destroy_machines(loaded_config,args=[]):
         exit_with_error(1,"destroy: could NOT get list of machines, exiting")
     
     # Sort out what needs to be deleted
-    delete_machines       = []
+    delete_machines     = []
     if "ALL" in args:
         delete_machines = running_machine_list
         N = len(delete_machines)
@@ -788,21 +788,26 @@ def destroy_machines(loaded_config,args=[]):
         for item in running_machine_list:
             if item.name.startswith(base_name):
                 delete_machines.append(item)
-        N = len(delete_machines)
+        N      = len(delete_machines)
         banner = "Destroying machine series: " + base_name + ", " + str(N) + " machine(s)"
     
     fails = 0
-    message(banner)
+    destroyed_list = []
+    if terse == False:
+        message(banner)
     for item in delete_machines:
         try:
             item.destroy()
-            submsg(item.name + " destroyed")
+            if terse == False:
+                submsg(item.name + " destroyed")
         except:
             warn("Could not destroy" + item.name)
             fails += 1
         else:
+            destroyed_list.append(item.name)
             if loaded_config['domain'] != '':
-                submsg("[+]-Removing DNS")
+                if terse == False:
+                    submsg("[+]-Removing DNS")
                 try:
                     remove_subdomain(loaded_config,item.name)
                 except digitalocean.NotFoundError:
@@ -813,10 +818,22 @@ def destroy_machines(loaded_config,args=[]):
                     fails += 1
             
     if fails >= 1:
-        message("Done, but with " + str(fails) + " failures")
+        if terse == False:
+            output = "Done, but with %s failures" % str(fails)
+            message(output)
+        elif terse == True:
+            output = ",".join(destroyed_list)
+            print(output)
+        else:
+            exit_with_error(9,"destroy: fails: terse neither True nor False, debug!")
         sys.exit(1)
     else:
-        message("Done")
+        if terse == False:
+            message("Done")
+        elif terse == True:
+            output = ",".join(destroyed_list)
+            print(output)
+        sys.exit(0)
 
 def set_config(config_dir,loaded_config,item,value):
     '''update config, vars loaded_config is a dict of values to write, the rest should be self explanitory'''
@@ -1177,7 +1194,7 @@ def main():
     parser.add_argument("command", nargs="?"    ,help="See above for description of commands")
     parser.add_argument("arguments", nargs="*"  ,help="Arguments for command, see above")
     parser.add_argument("-?","--help"           ,help="Show This Help Message", action="help")
-    parser.add_argument("-T","--terse"          ,help="when using list or print-config, print CSV format instead of justified tab tables. For spawn, prints a NAME:IP pair seperated by commas",action="store_true")
+    parser.add_argument("-T","--terse"          ,help="when using list or print-config, print CSV format instead of justified tab tables.\n\nFor spawn, prints a NAME:IP pair seperated by commas\n\nFor destroy, a comma seperated list of machines destroyed",action="store_true")
 
     config_overrides = parser.add_argument_group("Config Overrides","Configuration Overrides, lower case")
     config_overrides.add_argument("-a","--api-key"    ,help="Digitial Ocean API key to use",type=str)
@@ -1293,7 +1310,7 @@ def main():
             options = args.arguments
         else:
             options = []
-        destroy_machines(loaded_config,options)
+        destroy_machines(loaded_config,options,terse=args.terse)
     elif args.command == "check-config":
         check_and_print_config(loaded_config,args.terse)
     else:

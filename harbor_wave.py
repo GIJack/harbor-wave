@@ -532,7 +532,7 @@ def create_machine(loaded_config,machine_name,ssh_key,user_meta=""):
         try:
             use_project.assign_resource([droplet_add_string])
         except:
-            warn_line = "Could not add %s to project %s. Check perms on API Key" %(machine_name,loaded_config['project'])
+            warn_line = "Could not add %s to project \'%s\'. Check perms on API Key" %(machine_name,loaded_config['project'])
             warn(warn_line)
     # return VM for use in array later
     return new_vm

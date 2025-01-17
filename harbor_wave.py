@@ -1220,9 +1220,6 @@ def main():
         loaded_config['template']      = args.template
     if args.no_wait == True:
         loaded_config['wait']          = False
-    # Now check if we are using a domain, once all options haave been merged replaces --use-dns
-    if loaded_config['domain']   !=  "":
-        loaded_config['use-dns']       = True
 
     # Lets roll. Commands do their own checks
     if args.command == None:

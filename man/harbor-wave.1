@@ -182,7 +182,13 @@ configuration override options are lower case. everything else is upper case
 \t Help Message
 
 .BR "-T, --terse"
-list and print-config commands uses CSV format for output. Does nothing for all other commands.
+Commands uses CSV format for output. for list and print-config, you have no
+headers, but the tab seperated columns are replaced by commas.
+
+For spawn, all printing is surpressed except errors and warns that got to STDERR
+and it just lists a CSV of IP addresses of machines spawned, and only the IPs.
+This is in order of being spawned. For DNS, this uses a comma seperated list
+of DNS:IP
 
 .SS CONFIG OVERRIDE OPTIONS
 .BR "-a, --api-key" \fR \t API_KEY

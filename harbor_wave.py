@@ -1230,7 +1230,7 @@ def main():
     if args.tag != None:
         loaded_config['tag']           = args.tag
     if args.region != None:
-        loaded.config['region']        = args.region
+        loaded_config['region']        = args.region
     if args.ssh_key_n != None:
         loaded_config['ssh-key-n']     = args.ssh_key_n
     if args.base_name != None:

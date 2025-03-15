@@ -12,12 +12,20 @@ ACTIONS
 machines using previously set settings, or --overide options. If N is not
 specified, then 1 is the default.
 
+if the -T,--terse option is used, then a comma seperated list of name:ip pairs.
+
+e.g.
+machine1:192.0.2.50,machine2:192.0.2.51
+
 **DESTROY** *\<ALL\>*	Destroy all virtual machines that match "tag" from
 settings, and their name begins with "base-name". if ALL in all caps is
 specified, then all machines with matching "tag" are deleted, not just those
 matching "base-name". The idea would be normally this will just take down only
 the machines immediately spawned previously with spawn, or optionally with the
 the --base-name/-n switch, a previous harbor-wave application
+
+if the -T,--terse option is used, then just a list of machine names destroyed
+is printed
 
 CONFIGURATION
 -------------

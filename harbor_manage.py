@@ -14,6 +14,8 @@ template.rc
 
 import argparse
 import os,sys
+import boto3
+import digitalocean
 
 default_config = {
 }

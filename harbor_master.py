@@ -38,6 +38,8 @@ command_help='''
   disk-image-scripts template.rc is present in the current directory, metadata
   will be used from this file.
   
+  delete_template [id] - delete custom template from Digital Ocean
+  
   clean               - delete all files in the S3/spaces bucket
 '''
 config_help='''

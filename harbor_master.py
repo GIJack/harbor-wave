@@ -33,12 +33,17 @@ command_help='''
   
   print-config        - print all config items in pretty table.
   
-  add_template [file] - upload template file to bucket and add it as template
-  in digital ocean. Must be a supported custom template format. If
-  disk-image-scripts template.rc is present in the current directory, metadata
-  will be used from this file.
+  add [what] - add an item
+  subcommands/arguments:
+      
+      template [options]   - add custom droplet template. format tbd
   
-  delete_template [id] - delete custom template from Digital Ocean
+  delete [what] - delete from your account.
+  Subcommands/arguments:
+  
+      template [id]   - delete custom template from Digital Ocean
+      
+      file [filename] - delete file from Spaces/S3 bucket.
   
   clean               - delete all files in the S3/spaces bucket
 '''

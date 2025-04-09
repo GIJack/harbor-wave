@@ -27,7 +27,7 @@ command_help='''
       files      - Show files in S3/spaces bucket.
   
   set [item] [value]  - set a config item. See bellow for list of config items.
-  Setting a value of "" will reset this item to its default value
+  Setting a value of "" will reset this item to its default value.
 
   get [item]          - print value for item, see bellow for list of config items
   
@@ -50,15 +50,15 @@ command_help='''
 config_help='''
         CONFIG ITEMS:
 
-   api-key       - Digital Ocean API key, used for accessing the account. NOTE this
-   is the only option that does NOT go in the .cfg file, but rather the seperate
-   api-key file. Shared setting with harbor-wave
-   
-   bucket        - S3 compatable bucket(DigitalOcean Spaces) to use for uploads
-   
-   bucket_key    - API key to use for uploads to bucket
-   
-   bucket_secret - API secret to use for uploads to bucket
+  api-key            - digital ocean API key. NOTE: This setting is
+  shared with harbor-wave, setting in one affects the other
+      
+  bucket             - Spaces/S3 Bucket URL. This is where you upload
+  template files before being added
+      
+  bucket-key-name    - Spaces/S3 bucket key name
+     
+  bucket-key-seceret - Spaces/S3 bucket key secret
 '''
 full_help_banner=prog_desc+command_help+config_help
 
@@ -70,6 +70,7 @@ import digitalocean
 
 default_config = {
   "bucket"    : "",
+  "bucket_key_name" : "",
 }
 
 class colors:
@@ -93,6 +94,46 @@ def submsg(message):
 def warn(message):
     print("harbor-template:" + colors.yellow + colors.bold + " ¡WARN!: " + colors.reset + message, file=sys.stderr)
     return
+
+def check_api_key(key):
+    '''checks if API key is valid format. returns True/False. Takes one parameter, the key'''
+    # a DO access key is 64 characters long, hexidecimal, new format has
+    # meta headers before the hexdec
+    key_len = 64
+    base    = 16
+    # Strip headers, if present
+    key = key.split('_')[-1]
+    # Key is a string
+    if type(key) != str:
+        return False
+    # Key is 64 characters long
+    if len(key) != key_len:
+        return False
+    # Key is hexdecimal
+    try:
+        int(key,base)
+    except:
+        return False
+    # No more tests
+    return True
+
+def check_and_connect(loaded_config):
+    '''give the loaded config, check the API key, and return a DO manager session'''
+    
+    # check to make sure we have the right config options
+    needed_keys = ("api-key")
+    for key in needed_keys:
+        if key not in loaded_config.keys():
+            exit_with_error(2,key + " not set. see help config")
+    
+    api_key = loaded_config['api-key']
+    if check_api_key(api_key) != True:
+        exit_with_error(2,"Invalid API Key")
+        
+    # get open a session
+    manager = digitalocean.Manager(token=api_key)
+    
+    return manager
     
 def check_and_load_config(config_dir):
     '''Runs on startup: checks and loads config file. missing entries are added, missing config files are made. takes one parameter: filename for config dir'''
@@ -159,6 +200,65 @@ def check_and_load_config(config_dir):
         loaded_config['api-key'] = None
 
     return loaded_config
+
+def list_templates(loaded_config,terse=False):
+    '''List available templates to make machines from. Takes one parameter, the config dict '''    
+    # get images
+    manager = check_and_connect(loaded_config)
+    try:
+        all_images = manager.get_my_images()
+    except digitalocean.DataReadError:
+        exit_with_error(2,"list: DataReadError, check settings and try again")
+    
+    # Seperate out user uploaded images
+    use_images = []
+    for image in all_images:
+        if image.type == "custom":
+            use_images.append(image)
+            
+    #now print
+    tab_size = 30
+    banner = colors.bold + "ID\tREGIONS\tDESCRIPTION".expandtabs(tab_size) + colors.reset
+    if terse == False:
+        print(banner)
+        for image in use_images:
+            out_line = str(image.id) + "\t" + ",".join(image.regions) + "\t" + image.name
+            out_line = out_line.expandtabs(tab_size)
+            print(out_line)
+    elif terse == True:
+        for image in use_images:
+            out_line = str(image.id) + "," + " ".join(image.regions) + "," + image.name
+            print(out_line)
+    else:
+        exit_with_error(10,"list: templates: terse is neither true nor false. should not happen, debug")
+
+ef print_config(loaded_config,terse=False):
+    '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''
+    restricted_list = ['api-key', 'bucket_key_secret']
+    header_line= colors.bold + "ITEM\t\tVALUE".expandtabs(13) + colors.reset
+    if terse == False:
+        print(header_line)
+        out_line=""
+        for item in loaded_config:
+            if item in restricted_list:
+                value = "********"
+            else:
+                value = loaded_config[item]
+                value = str(value)
+            out_line = item + "\t\t" + value
+            out_line = out_line.expandtabs(13)
+            print(out_line)
+    elif terse == True:
+        for item in loaded_config:
+            if item in restricted_list:
+                value = "HIDDEN"
+            else:
+                value = loaded_config[item]
+                value = str(value)
+            out_line = item + ',' + value
+            print(out_line)
+    else:
+        exit_with_error(9,"print-config: terse is neither True nor False, should never get here, debug!")
 
 def main():
     parser = argparse.ArgumentParser(description=full_help_banner,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)

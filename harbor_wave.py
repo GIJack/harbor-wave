@@ -324,19 +324,25 @@ def list_regions(loaded_config,terse=False):
         regions = manager.get_all_regions()
     except digitalocean.DataReadError:
         exit_with_error(2,"list: DataReadError, check settings and try again")
+        
+    #Put them in a dict{} and sort
+    region_dict = {}
+    for item in regions:
+        region_dict[item.slug] = item.name
+    sorted_regions = sorted(region_dict)
 
     #print
     tab_space = 13
     banner = colors.bold + "ID\tDESCRIPTION".expandtabs(tab_space) + colors.reset
     if terse == False:
         print(banner)
-        for item in regions:
-            out_line = item.slug + "\t" + item.name
+        for item in sorted_regions:
+            out_line = item + "\t" + region_dict[item]
             out_line = out_line.expandtabs(tab_space)
             print(out_line)
     elif terse == True:
-        for item in regions:
-            out_line = item.slug + "," + item.name
+        for item in sorted_regions:
+            out_line = item + "," + region_dict[item]
             print(out_line)
     else:
         exit_with_error(10,"list: regions: terse neither true nor false, should not be, debug!")

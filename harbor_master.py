@@ -10,6 +10,9 @@ Needs a digital ocean API key and an S3 Bucket(DO Spaces), you can upload to.
 Works hand-in-hand with disk-image-scripts if you are uploading a compiled
 project from within the template dir it will fill in information from the
 template.rc
+
+For the template.rc format see here:
+https://github.com/GIJack/disk-image-scripts/blob/master/default_template/template.rc
 '''
 command_help='''
 			COMMANDS:
@@ -38,7 +41,11 @@ command_help='''
   add [what] - add an item
   subcommands/arguments:
       
-      template [options]   - add custom droplet template. format tbd
+      template [filename] <template.rc>   - add custom droplet template. upload
+      a file to the bucket and then add it as a Digital Ocean template for use
+      with harbor-wave. fill in specifications from the disk-image-scripts
+      template.rc. If no second filename is specified, there is an attempt to
+      read it from current directory.
       
       region [template id] [regions] - add one or more regions to existing
       template.

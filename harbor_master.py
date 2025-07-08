@@ -37,8 +37,11 @@ command_help='''
   subcommands/arguments:
       
       template [options]   - add custom droplet template. format tbd
+      
+      region [template id] [regions] - add one or more regions to existing
+      template.
   
-  delete [what] - delete from your account.
+  del [what] - delete from your account.
   Subcommands/arguments:
   
       template [id]   - delete custom template from Digital Ocean
@@ -72,8 +75,7 @@ import digitalocean
 default_config = {
   "bucket"          : "",
   "bucket-key-name" : "",
-  "bucket"    : "",
-  "bucket_key_name" : "",
+  "region"       : "nyc1",
 }
 
 class colors:
@@ -228,34 +230,6 @@ def check_and_load_config(config_dir):
         loaded_config['bucket-key-secret'] = None
 
     return loaded_config
-    
-def print_config(loaded_config,terse=False):
-    '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''
-    restricted_list = ['api-key','bucket-key-secret']
-    header_line= colors.bold + "ITEM\t\tVALUE".expandtabs(13) + colors.reset
-    if terse == False:
-        print(header_line)
-        out_line=""
-        for item in loaded_config:
-            if item in restricted_list:
-                value = "********"
-            else:
-                value = loaded_config[item]
-                value = str(value)
-            out_line = item + "\t\t" + value
-            out_line = out_line.expandtabs(13)
-            print(out_line)
-    elif terse == True:
-        for item in loaded_config:
-            if item in restricted_list:
-                value = "HIDDEN"
-            else:
-                value = loaded_config[item]
-                value = str(value)
-            out_line = item + ',' + value
-            print(out_line)
-    else:
-        exit_with_error(9,"print-config: terse is neither True nor False, should never get here, debug!")
     
 def get_config(loaded_config,item):
     '''prints working config item, takes two options, dict with config items, and item you need'''
@@ -422,12 +396,19 @@ def main():
     parser.add_argument("arguments", nargs="*"  ,help="Arguments for command, see above")
     parser.add_argument("-?","--help"           ,help="Show This Help Message", action="help")
     parser.add_argument("-T","--terse"          ,help="terse output, for scripting",action="store_true")
+    
+    config_overrides = parser.add_argument_group("Config Overrides","Configuration Overrides, lower case")
+    config_overrides.add_argument("-r","--region"  ,help="Region code. Specify what datacenter this goes in",type=str)
 
     args = parser.parse_args()
     
     # get config from file
     config_dir = os.getenv("HOME") + "/.config/harbor-wave/"
     loaded_config = check_and_load_config(config_dir)
+
+    # Now apply command line switch options
+    if args.region != None:
+        loaded_config['region'] = args.region
     
     # Lets roll. Commands do their own checks
     if args.command == None:

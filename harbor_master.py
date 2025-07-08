@@ -75,7 +75,7 @@ import digitalocean
 default_config = {
   "bucket"          : "",
   "bucket-key-name" : "",
-  "region"       : "nyc1",
+  "region"          : "nyc1",
 }
 
 class colors:

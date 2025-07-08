@@ -64,22 +64,16 @@ full_help_banner=prog_desc+command_help+config_help
 
 
 import argparse
-<<<<<<< HEAD
 import json
-=======
->>>>>>> f45cacd78fe04e127e7074f3ccc3437550a81bc4
 import os,sys
 import boto3
 import digitalocean
 
 default_config = {
-<<<<<<< HEAD
   "bucket"          : "",
   "bucket-key-name" : "",
-=======
   "bucket"    : "",
   "bucket_key_name" : "",
->>>>>>> f45cacd78fe04e127e7074f3ccc3437550a81bc4
 }
 
 class colors:
@@ -148,7 +142,6 @@ def check_and_load_config(config_dir):
     '''Runs on startup: checks and loads config file. missing entries are added, missing config files are made. takes one parameter: filename for config dir'''
     
     # Mabey we should put these somewhere else? idk, top level dict?
-<<<<<<< HEAD
     config_file_name       = "harbor-master.cfg"
     api_file_name          = "api-key"
     bucket_secret_filename = "bucket-key-secret"
@@ -158,7 +151,6 @@ def check_and_load_config(config_dir):
     loaded_config         = None
     loaded_api_key        = None
     loaded_bucket_secret  = None
-=======
     config_file_name = "harbor-master.cfg"
     api_file_name    = "api-key"
     
@@ -166,7 +158,6 @@ def check_and_load_config(config_dir):
     # failed
     loaded_config    = None
     loaded_api_key   = None
->>>>>>> f45cacd78fe04e127e7074f3ccc3437550a81bc4
     
     # check if config directory exists. If not make it:
     if os.path.isdir(config_dir) == False and os.path.exists(config_dir) == True:
@@ -219,7 +210,7 @@ def check_and_load_config(config_dir):
             warn("could not read API key from api-key file, check permissions")
     else:
         loaded_config['api-key'] = None
-<<<<<<< HEAD
+
     #Load Bucket Secret key in same fashion
     bucket_secret_file = config_dir + "/" + bucket_secret_filename
     if os.path.isfile(bucket_secret_file) == False and os.path.exists(bucket_secret_file) == True:
@@ -363,10 +354,8 @@ def write_config(file_name,config_obj):
     file_obj = open(file_name, "w")
     file_obj.write(contents)
     file_obj.close()
-=======
 
     return loaded_config
->>>>>>> f45cacd78fe04e127e7074f3ccc3437550a81bc4
 
 def list_templates(loaded_config,terse=False):
     '''List available templates to make machines from. Takes one parameter, the config dict '''    
@@ -399,9 +388,7 @@ def list_templates(loaded_config,terse=False):
     else:
         exit_with_error(10,"list: templates: terse is neither true nor false. should not happen, debug")
 
-<<<<<<< HEAD
-=======
-ef print_config(loaded_config,terse=False):
+def print_config(loaded_config,terse=False):
     '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''
     restricted_list = ['api-key', 'bucket_key_secret']
     header_line= colors.bold + "ITEM\t\tVALUE".expandtabs(13) + colors.reset
@@ -429,7 +416,6 @@ ef print_config(loaded_config,terse=False):
     else:
         exit_with_error(9,"print-config: terse is neither True nor False, should never get here, debug!")
 
->>>>>>> f45cacd78fe04e127e7074f3ccc3437550a81bc4
 def main():
     parser = argparse.ArgumentParser(description=full_help_banner,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("command", nargs="?"    ,help="See above for description of commands")
@@ -441,7 +427,6 @@ def main():
     
     # get config from file
     config_dir = os.getenv("HOME") + "/.config/harbor-wave/"
-<<<<<<< HEAD
     loaded_config = check_and_load_config(config_dir)
     
     # Lets roll. Commands do their own checks
@@ -476,9 +461,6 @@ def main():
         get_config(loaded_config,item)
     elif args.command == "print-config":
         print_config(loaded_config,args.terse)
-
-=======
->>>>>>> f45cacd78fe04e127e7074f3ccc3437550a81bc4
 
 if __name__ == "__main__":
     main()

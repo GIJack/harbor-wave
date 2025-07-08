@@ -25,6 +25,8 @@ command_help='''
       templates  - Show custom droplet templates in digitalocean(can be used).
       
       files      - Show files in S3/spaces bucket.
+      
+      regions    - Show all available regions from Digital Ocean
   
   set [item] [value]  - set a config item. See bellow for list of config items.
   Setting a value of "" will reset this item to its default value.
@@ -47,6 +49,9 @@ command_help='''
       template [id]   - delete custom template from Digital Ocean
       
       file [filename] - delete file from Spaces/S3 bucket.
+      
+      region [template id] [regions] - remove one or more regions to an existing
+      template
   
   clean               - delete all files in the S3/spaces bucket
 '''

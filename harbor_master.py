@@ -77,11 +77,13 @@ config_help='''
 '''
 full_help_banner=prog_desc+command_help+config_help
 
-
+#python imports
 import argparse
 import json
 import os,sys
+#third party imports
 import boto3
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 import digitalocean
 
 default_config = {
@@ -310,8 +312,9 @@ def set_config(config_dir,loaded_config,item,value):
         # now update the config array, but not for the api-key
         loaded_config[item] = value
     
-    # Make sure we keep the API key out of the main config
+    # Make sure we keep secrets out of the main config
     del(loaded_config['api-key'])
+    del(loaded_config['bucket-key-secret'])
     
     # write the config. Write API key and bucket secret to their own files,
     # otherwise save to the main config
@@ -401,6 +404,10 @@ def print_config(loaded_config,terse=False):
             print(out_line)
     else:
         exit_with_error(9,"print-config: terse is neither True nor False, should never get here, debug!")
+
+def list_bucket_files(loaded_config):
+    '''list files in bucket'''
+    pass
 
 def main():
     parser = argparse.ArgumentParser(description=full_help_banner,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)

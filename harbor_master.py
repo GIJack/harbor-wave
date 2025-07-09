@@ -379,7 +379,7 @@ def list_templates(loaded_config,terse=False):
 
 def print_config(loaded_config,terse=False):
     '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''
-    restricted_list = ['api-key', 'bucket_key_secret']
+    restricted_list = ['api-key', 'bucket-key-secret']
     header_line= colors.bold + "ITEM\t\tVALUE".expandtabs(13) + colors.reset
     if terse == False:
         print(header_line)

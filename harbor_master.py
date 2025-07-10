@@ -407,7 +407,7 @@ def print_config(loaded_config,terse=False):
         exit_with_error(9,"print-config: terse is neither True nor False, should never get here, debug!")
 
 def gen_bucket_client(loaded_config):
-    url = "http://%s.digitaloceanspaces.com/" % (loaded_config["region"])
+    url = "https://%s.digitaloceanspaces.com/" % (loaded_config["region"])
     
     session = boto3.session.Session()
     client  = session.client(

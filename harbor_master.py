@@ -83,7 +83,7 @@ import json
 import os,sys
 #third party imports
 import boto3
-from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+import botocore
 import digitalocean
 
 default_config = {
@@ -405,6 +405,20 @@ def print_config(loaded_config,terse=False):
             print(out_line)
     else:
         exit_with_error(9,"print-config: terse is neither True nor False, should never get here, debug!")
+
+def gen_bucket_client(loaded_config):
+    url = "http://%s.digitaloceanspaces.com/" % (loaded_config["region"])
+    
+    session = boto3.session.Session()
+    client  = session.client(
+        's3',
+        region_name           = loaded_config["region"],
+        endpoint_url          = url,
+        aws_access_key_id     = loaded_config["bucket-key-name"],
+        aws_secret_access_key = loaded_config["bucket-key-secret"]
+    )
+    
+    return client
 
 def list_bucket_files(loaded_config):
     '''list files in bucket'''

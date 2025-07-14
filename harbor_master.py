@@ -101,17 +101,17 @@ class colors:
     yellow='\033[93m'
 
 def message(message):
-    print("harbor-template: " + message)
+    print("harbor-master: " + message)
 
 def exit_with_error(exit,message):
-    print("harbor-template" + colors.red + colors.bold + " ¡ERROR!: " + colors.reset + message, file=sys.stderr)
+    print("harbor-master" + colors.red + colors.bold + " ¡ERROR!: " + colors.reset + message, file=sys.stderr)
     sys.exit(exit)
 
 def submsg(message):
     print("\t" + message)
     
 def warn(message):
-    print("harbor-template:" + colors.yellow + colors.bold + " ¡WARN!: " + colors.reset + message, file=sys.stderr)
+    print("harbor-master:" + colors.yellow + colors.bold + " ¡WARN!: " + colors.reset + message, file=sys.stderr)
     return
 
 def check_api_key(key):

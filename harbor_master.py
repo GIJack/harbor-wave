@@ -318,21 +318,21 @@ def set_config(config_dir,loaded_config,item,value):
     
     # write the config. Write API key and bucket secret to their own files,
     # otherwise save to the main config
-  #  try:
-    if item == "api-key":
-        file_obj = open(api_file,"w")
-        file_obj.write(value)
-        file_obj.close()
-        os.chmod(api_file, 0o600)
-    elif item == "bucket-key-secret":
-        file_obj = open(bucket_secret_file,"w")
-        file_obj.write(value)
-        file_obj.close()
-        os.chmod(api_file, 0o600)
-    else:
-        write_config(config_file,loaded_config)
-   # except:
-   #     exit_with_error(2,"set: Could not write to config file")
+    try:
+        if item == "api-key":
+            file_obj = open(api_file,"w")
+            file_obj.write(value)
+            file_obj.close()
+            os.chmod(api_file, 0o600)
+        elif item == "bucket-key-secret":
+            file_obj = open(bucket_secret_file,"w")
+            file_obj.write(value)
+            file_obj.close()
+            os.chmod(api_file, 0o600)
+        else:
+            write_config(config_file,loaded_config)
+    except:
+        exit_with_error(2,"set: Could not write to config file")
 
 def write_config(file_name,config_obj):
     '''write config to JSON file'''
@@ -344,7 +344,7 @@ def write_config(file_name,config_obj):
     file_obj.write(contents)
     file_obj.close()
 
-    return 
+    return
 
 def list_templates(loaded_config,terse=False):
     '''List available templates to make machines from. Takes one parameter, the config dict '''    

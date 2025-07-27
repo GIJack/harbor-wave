@@ -270,7 +270,7 @@ def set_config(config_dir,loaded_config,item,value):
     api_file           = "%s/%s" % (config_dir,api_file_name)
     config_file        = "%s/%s" % (config_dir,config_file_name)
     bucket_secret_file = "%s/%s" % (config_dir,bucket_secret_file_name)
-    set_item_str       = ["api-key","bucket", "bucket-key-name","bucket-key-secret"]
+    set_item_str       = ["api-key","bucket", "bucket-key-name","bucket-key-secret","region"]
     all_set_items      = set_item_str # + set_item_int + set_item_bool
     
     # Null value check

@@ -420,9 +420,47 @@ def gen_bucket_client(loaded_config):
     
     return client
 
-def list_bucket_files(loaded_config):
+def list_bucket_files(loaded_config,bucket_name,terse=False):
     '''list files in bucket'''
-    pass
+    # Formatting option
+    tab_size=30
+    
+    #Generate Bucket Object    
+    bucket_obj = gen_bucket_client(loaded_confg)
+    
+    # Query Server
+    try:
+        response = buckey_obj.list_objects_v2(Bucket=bucket_name)
+    except NoCredentialsError:
+        error_message = 'Credentials not provided or invalid.'
+        exit_with_error(1,error_message)
+    except EndpointConnectionError:
+        error_message = f'Unable to connect to endpoint: Check your region or endpoint.'
+        exit_with_error(1,error_message)
+    except Exception as e:
+        error_message =  f'An error occurred: {e}'
+        exit_with_error(1,error_message)
+        
+    # Now print results
+    header_line = colors.bold + "Filename\tLastModified".expandtabs(tab_size) + colors.reset
+    if terse != True:
+        print(header_line)
+    out_list = []
+    if 'Contents' in response:
+        for obj in response['Contents']:
+            if terse != True:
+                item_line = "%s\t%s" %  (obj['Key'],obj['LastModified'].ctime())
+                print(item_line)
+            else:
+                item_line = "%s:%s" % (obj['Key'],obj['LastModified'].ctime())
+                out_list.append(item_line)
+    else:
+        if terse != True:
+            item_line = "<No Items>"
+    #Now do terse printing 
+    if terse == True:
+        output = ",".join(out_lines)
+        print(output)
 
 def main():
     parser = argparse.ArgumentParser(description=full_help_banner,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)

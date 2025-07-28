@@ -377,6 +377,38 @@ def list_templates(loaded_config,terse=False):
     else:
         exit_with_error(10,"list: templates: terse is neither true nor false. should not happen, debug")
 
+def list_regions(loaded_config,terse=False):
+    '''List region codes and descriptions for use in config, pass the config dict'''
+
+    # get regions
+    manager = check_and_connect(loaded_config)
+    try:
+        regions = manager.get_all_regions()
+    except digitalocean.DataReadError:
+        exit_with_error(2,"list: DataReadError, check settings and try again")
+        
+    #Put them in a dict{} and sort
+    region_dict = {}
+    for item in regions:
+        region_dict[item.slug] = item.name
+    sorted_regions = sorted(region_dict)
+
+    #print
+    tab_space = 13
+    banner = colors.bold + "ID\tDESCRIPTION".expandtabs(tab_space) + colors.reset
+    if terse == False:
+        print(banner)
+        for item in sorted_regions:
+            out_line = item + "\t" + region_dict[item]
+            out_line = out_line.expandtabs(tab_space)
+            print(out_line)
+    elif terse == True:
+        for item in sorted_regions:
+            out_line = item + "," + region_dict[item]
+            print(out_line)
+    else:
+        exit_with_error(10,"list: regions: terse neither true nor false, should not be, debug!")
+
 def print_config(loaded_config,terse=False):
     '''Fancy printing of all config items. if terse is True, then print a comma-field seperated ver for grep and cut'''
     restricted_list = ['api-key', 'bucket-key-secret']
@@ -518,6 +550,19 @@ def main():
         get_config(loaded_config,item)
     elif args.command == "print-config":
         print_config(loaded_config,args.terse)
+    elif args.command == "list":
+        if len(args.arguments) < 1:
+            exit_with_error(2,"list: list what? needs an argument, see --help")
+        option = args.arguments[0]
+        if option == "help":
+            output_line = "list: following are valid list subcommands: templates, files, regions. See  --help for more info"
+            print(output_line)
+        elif option == "templates":
+            list_templates(loaded_config,args.terse)
+        elif option == "files":
+            list_templates(loaded_config,args.terse)
+        elif option == "regions":
+            list_regions(loaded_config,args.terse)
 
 if __name__ == "__main__":
     main()

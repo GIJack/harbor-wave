@@ -420,7 +420,7 @@ def gen_bucket_client(loaded_config):
     
     return client
 
-def list_bucket_files(loaded_config,bucket_name,terse=False):
+def list_bucket_files(loaded_config,terse=False):
     '''list files in bucket'''
     # Formatting option
     tab_size=30
@@ -430,7 +430,7 @@ def list_bucket_files(loaded_config,bucket_name,terse=False):
     
     # Query Server
     try:
-        response = buckey_obj.list_objects_v2(Bucket=bucket_name)
+        response = buckey_obj.list_objects_v2(Bucket=loaded_config['bucket'])
     except NoCredentialsError:
         error_message = 'Credentials not provided or invalid.'
         exit_with_error(1,error_message)
@@ -461,6 +461,10 @@ def list_bucket_files(loaded_config,bucket_name,terse=False):
     if terse == True:
         output = ",".join(out_lines)
         print(output)
+        
+def clean_bucket(loaded_config):
+    '''Delete All Files In Bucket'''
+    pass
 
 def main():
     parser = argparse.ArgumentParser(description=full_help_banner,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)

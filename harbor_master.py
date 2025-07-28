@@ -481,7 +481,7 @@ def list_bucket_files(loaded_config,terse=False):
     if 'Contents' in response:
         for obj in response['Contents']:
             if terse != True:
-                item_line = "%s\t%s" %  (obj['Key'],obj['LastModified'].ctime())
+                item_line = "%s\t%s".expandtabs(tab_size) % (obj['Key'],obj['LastModified'].ctime())
                 print(item_line)
             else:
                 item_line = "%s:%s" % (obj['Key'],obj['LastModified'].ctime())

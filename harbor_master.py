@@ -140,7 +140,7 @@ def check_and_connect(loaded_config):
     '''give the loaded config, check the API key, and return a DO manager session'''
     
     # check to make sure we have the right config options
-    needed_keys = ("api-key")
+    needed_keys = ["api-key"]
     for key in needed_keys:
         if key not in loaded_config.keys():
             exit_with_error(2,key + " not set. see help config")
@@ -440,6 +440,7 @@ def print_config(loaded_config,terse=False):
 
 def gen_bucket_client(loaded_config):
     url = "https://%s.digitaloceanspaces.com/" % (loaded_config["region"])
+    #url = "diskimages.nyc3.digitaloceanspaces.com"
     
     session = boto3.session.Session()
     client  = session.client(
@@ -458,19 +459,22 @@ def list_bucket_files(loaded_config,terse=False):
     tab_size=30
     
     #Generate Bucket Object    
-    bucket_obj = gen_bucket_client(loaded_confg)
+    bucket_obj = gen_bucket_client(loaded_config)
     
     # Query Server
     try:
-        response = buckey_obj.list_objects_v2(Bucket=loaded_config['bucket'])
-    except NoCredentialsError:
+        response = bucket_obj.list_objects_v2(Bucket=loaded_config['bucket'])
+    except botocore.exceptions.NoCredentialsError:
         error_message = 'Credentials not provided or invalid.'
         exit_with_error(1,error_message)
-    except EndpointConnectionError:
+    except botocore.exceptions.EndpointConnectionError:
         error_message = f'Unable to connect to endpoint: Check your region or endpoint.'
         exit_with_error(1,error_message)
+    except botocore.exceptions.ParamValidationError as e:
+        error_message = f'An Error Occured: ' + e.args[0]
+        exit_with_error(1,error_message)
     except Exception as e:
-        error_message =  f'An error occurred: {e}'
+        error_message =  f'An Error Occurred: {e}'
         exit_with_error(1,error_message)
         
     # Now print results
@@ -496,7 +500,30 @@ def list_bucket_files(loaded_config,terse=False):
         
 def clean_bucket(loaded_config):
     '''Delete All Files In Bucket'''
-    pass
+    
+    # Formatting option
+    tab_size=30
+    
+    #Generate Bucket Object    
+    bucket_obj = gen_bucket_client(loaded_confg)
+    
+    # Query Server
+    try:
+        response = bucket_obj.list_objects_v2(Bucket=loaded_config['bucket'])
+    except botocore.exceptions.NoCredentialsError:
+        error_message = 'Credentials not provided or invalid.'
+        exit_with_error(1,error_message)
+    except botocore.exceptions.EndpointConnectionError:
+        error_message = f'Unable to connect to endpoint: Check your region or endpoint.'
+        exit_with_error(1,error_message)
+    except botocore.exceptions.ParamValidationError as e:
+        error_message = f'An Error Occured: ' + e.args[0]
+        exit_with_error(1,error_message)
+    except Exception as e:
+        error_message =  f'An Error Occurred: {e}'
+        exit_with_error(1,error_message)
+        
+    
 
 def main():
     parser = argparse.ArgumentParser(description=full_help_banner,epilog="\n\n",add_help=False,formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -560,7 +587,7 @@ def main():
         elif option == "templates":
             list_templates(loaded_config,args.terse)
         elif option == "files":
-            list_templates(loaded_config,args.terse)
+            list_bucket_files(loaded_config,args.terse)
         elif option == "regions":
             list_regions(loaded_config,args.terse)
 

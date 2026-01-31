@@ -523,6 +523,10 @@ def clean_bucket(loaded_config):
         error_message =  f'An Error Occurred: {e}'
         exit_with_error(1,error_message)
         
+def delete_file(file_id,loaded_config):
+    '''Delete One File in the Bucket'''
+    pass
+        
     
 
 def main():
